@@ -18,6 +18,7 @@ class Locator
     void updatePixmap();
 
     const QPixmap& getPixmap() {return pixmap;}
+    const QPoint& getCenter() {return center;}
 
   private:
     QPixmap pixmap;

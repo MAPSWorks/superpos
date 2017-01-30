@@ -14,6 +14,8 @@ Widget::Widget():
   view -> setGeometry(20,20,800,600);
   view -> setScene(&drawer.getScene());
 
+  drawer.init();
+
   connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
   timer.start(4000);
 }

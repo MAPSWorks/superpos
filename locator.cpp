@@ -2,7 +2,7 @@
 
 Locator::Locator()
 {
-  pixmap = QPixmap(400, 400);
+  pixmap = QPixmap(400,400);
   pixmap.fill(Qt::white);
 }
 
@@ -12,6 +12,10 @@ void Locator::init(QPoint cnt, double ang0)
   angle0 = ang0;
 }
 
+void Locator::addBackground(const char * filename)
+{
+  parser.openFile(filename);
+}
 
 void Locator::updatePixmap()
 {
@@ -19,8 +23,8 @@ void Locator::updatePixmap()
 
   painter.begin(&pixmap);
   painter.setRenderHint(QPainter::Antialiasing);
-  painter.translate(center);
-  painter.scale(0.03, 0.03);
+  painter.translate(200,200);
+  painter.scale(0.1, 0.1);
 
   for (int n = 0; n < 750; ++n) {
 
@@ -35,7 +39,7 @@ void Locator::updatePixmap()
       if (col < 0)   col = 0;
       if (col > 255) col = 255;
 
-      painter.setPen( QPen(QColor(col,col,col), 30, Qt::SolidLine) );
+      painter.setPen( QPen(QColor(col,col,col), 50, Qt::SolidLine) );
 
       painter.drawLine(i*step,i*step, (i+1)*step,(i+1)*step);
     }

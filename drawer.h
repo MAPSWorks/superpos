@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QTimer>
 #include <QGraphicsScene>
+#include <QGraphicsItem>
 
 #include <iostream>
 #include <vector>

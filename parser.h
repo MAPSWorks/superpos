@@ -14,7 +14,7 @@ public:
   Parser();
   ~Parser() {}
 
-  void openFile();
+  void openFile(const char*);
   const DATA_PACKAGE_AD getData();
 
 private:
