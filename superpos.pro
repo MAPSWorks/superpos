@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         widget.cpp \
     drawer.cpp \
     parser.cpp \
-    locator.cpp
+    locator.cpp \
+    target.cpp
 
 HEADERS  += widget.h \
     drawer.h \
     parser.h \
     rls_header.h \
-    locator.h
+    locator.h \
+    target.h
 
 FORMS    += widget.ui

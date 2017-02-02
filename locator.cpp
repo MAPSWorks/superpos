@@ -3,7 +3,6 @@
 Locator::Locator()
 {
   pixmap = QPixmap(400,400);
-  pixmap.fill(Qt::white);
 }
 
 void Locator::init(QPoint cnt, double ang0)
@@ -32,7 +31,7 @@ void Locator::updatePixmap()
     painter.rotate(360.0 * data.data.line_pos.pos / MAX_LINE_POS);
 
     int step = 1;
-    for (int i = 0; i < DATA_LEN_SPECTR_4K; i++) {
+    for (int i = 0; i < 1000/*DATA_LEN_SPECTR_4K*/; i++) {
       float x = data.data.out_data.spectr[i];
       int col = pow(0.9 * x, 0.8);
 

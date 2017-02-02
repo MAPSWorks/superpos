@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QPainter>
 #include <QPixmap>
-#include <QTimer>
+#include <QTime>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 
@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "locator.h"
+#include "target.h"
 
 #define LOCATORS_NUM 2
 
@@ -33,9 +34,12 @@ class Drawer : public QObject
 
   private:
     QPixmap pixmap;
-    QGraphicsScene scene;
+    QGraphicsScene scene, background;
+    QTime time;
+    QGraphicsItem *item;
 
     Locator locators[LOCATORS_NUM];
+    std::vector<Target> targets;
 };
 
 #endif // DRAWER_H

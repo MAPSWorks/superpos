@@ -17,7 +17,7 @@ Widget::Widget():
   drawer.init();
 
   connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
-  timer.start(4000);
+  timer.start(500);
 }
 
 Widget::~Widget()
