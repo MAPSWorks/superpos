@@ -17,7 +17,7 @@ Widget::Widget():
   drawer.init();
 
   connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
-  timer.start(500);
+  timer.start(DELTA_T * 1000);
 }
 
 Widget::~Widget()

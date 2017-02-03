@@ -28,8 +28,6 @@ void Drawer::init()
 
   targets.push_back(Target(QPoint(0,0), QPoint(20,20)));
 
-
-
   time.start();
 
   emit updateScreen();
@@ -38,22 +36,27 @@ void Drawer::init()
 void Drawer::process()
 {
   QPoint crd = targets[0].getCoords(0.001*time.elapsed());
-  cout << crd.x() << endl;
 
   scene.clear();
 
   for (int i = 0; i < LOCATORS_NUM; ++i) {
+    // Фоновая обстановка по данным локатора:
     pixmap = locators[i].getPixmap();
     QGraphicsItem *itemPixmap = scene.addPixmap(pixmap);
     itemPixmap->setOpacity(0.5);
-    itemPixmap->setFlag(QGraphicsItem::ItemIsMovable);
+    //itemPixmap->setFlag(QGraphicsItem::ItemIsMovable);
     itemPixmap->setPos(locators[i].getCenter());
 
-    scene.addLine(QLineF(locators[i].getCenter(),
-                         QPoint(locators[i].getCenter().x() + 100,
-                                locators[i].getCenter().y())), QPen(Qt::red, 10));
+    // Текущее направление локатора:
+    QPoint cnt = locators[i].getCenter() + QPoint(200,200);
+    double phi = locators[i].getNextPhi();
+    double L = 200;
+    scene.addLine(QLineF(cnt,
+                         QPoint(cnt.x() + L*cos(phi), cnt.y() + L*sin(phi))),
+                         QPen(Qt::red, 2));
   }
 
+  // Цель:
   item = scene.addEllipse(-5,-5, 10,10, QPen(), QBrush(Qt::white));
   item->setPos(crd);
 

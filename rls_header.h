@@ -8,6 +8,8 @@
 #define DATA_LEN_LOG_SPECTR_4K  4096 // uchar
 
 #define MAX_LINE_POS  4096
+#define POS_TO_GRAD (360.0 / MAX_LINE_POS)
+#define GRAD_TO_POS (1 / POS_TO_GRAD)
 
 #pragma pack(push)
 #pragma pack(1)
