@@ -7,9 +7,9 @@
 
 #include "parser.h"
 
-#define DATA_NUM_ONE_ROUND 750
-#define DELTA_T 0.1
-#define TIME_ONE_ROUND 5.0
+#define DATA_NUM_ONE_ROUND 750 ///< Количество сообщений, составляющее один обзор
+#define DELTA_T            0.5 ///< Период обновления экрана
+#define TIME_ONE_ROUND     10.0 ///< Время одного обзора каждого локатора
 
 typedef std::vector<DATA_PACKAGE_AD> DataCont;
 
@@ -25,10 +25,9 @@ class Locator
 
     const QPixmap& getPixmap() {return pixmap;}
     const QPoint&  getCenter() {return center;}
+    void     setAngle0(double a) {angle0 = a;}
     double   getAngle0() {return angle0;}
     double   getNextPhi();
-
-    void setDeltaT(double dt) {deltaT = dt;}
 
   private:
     DataCont data;
@@ -38,7 +37,6 @@ class Locator
     QPoint center; // Координаты центра
     double angle0, // Смещение азимута
            phi;    // Текущий азимут
-    double deltaT; // Период поступления данных
 };
 
 #endif // LOCATOR_H

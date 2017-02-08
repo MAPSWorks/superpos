@@ -13,6 +13,77 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
+  <widget class="QSpinBox" name="spinBoxR1">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>680</y>
+     <width>47</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-180</number>
+   </property>
+   <property name="maximum">
+    <number>180</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBoxR2">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>680</y>
+     <width>47</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-180</number>
+   </property>
+   <property name="maximum">
+    <number>180</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>680</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Смещение азимута</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>660</y>
+     <width>59</width>
+     <height>15</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>РЛС 1</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>660</y>
+     <width>59</width>
+     <height>15</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>РЛС 2</string>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

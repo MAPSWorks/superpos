@@ -10,6 +10,8 @@
 #define MAX_LINE_POS  4096
 #define POS_TO_GRAD (360.0 / MAX_LINE_POS)
 #define GRAD_TO_POS (1 / POS_TO_GRAD)
+#define RAD_TO_GRAD (180.0 / 3.14151945)
+#define GRAD_TO_RAD (1 / RAD_TO_GRAD)
 
 #pragma pack(push)
 #pragma pack(1)

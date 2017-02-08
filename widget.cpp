@@ -16,6 +16,12 @@ Widget::Widget():
 
   drawer.init();
 
+  connect(ui->spinBoxR1, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS1(int)));
+  connect(ui->spinBoxR2, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS2(int)));
+
+
+
+
   connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
   timer.start(DELTA_T * 1000);
 }

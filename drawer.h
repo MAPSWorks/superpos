@@ -32,6 +32,9 @@ class Drawer : public QObject
   public slots:
     void process();
 
+    void setAngle0_RLS1(int val) {locators[0].setAngle0(val);}
+    void setAngle0_RLS2(int val) {locators[1].setAngle0(val);}
+
   private:
     QPixmap pixmap;
     QGraphicsScene scene, background;

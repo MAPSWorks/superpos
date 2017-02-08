@@ -1,15 +1,19 @@
 #include "locator.h"
 
+#include <iostream>
+
+using namespace std;
+
 Locator::Locator()
 {
   pixmap = QPixmap(400,400);
+  pixmap.fill(Qt::transparent);
 }
 
 void Locator::init(QPoint cnt, double ang0)
 {
   center = cnt;
   angle0 = ang0;
-  deltaT = 0.1;
 }
 
 void Locator::addBackground(const char * filename)
@@ -62,8 +66,8 @@ void Locator::updatePixmap()
 
 double Locator::getNextPhi()
 {
-  phi += 6.28 * deltaT / TIME_ONE_ROUND;
-  if (phi > 6.28)
-    phi -= 6.28;
-  return phi;
+  phi += 360 * DELTA_T / TIME_ONE_ROUND;
+  if ((angle0 + phi) >= 360)
+    phi -= 360;
+  return angle0 + phi;
 }

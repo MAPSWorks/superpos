@@ -39,21 +39,30 @@ void Drawer::process()
 
   scene.clear();
 
+  // Фоновая обстановка по данным локаторов:
   for (int i = 0; i < LOCATORS_NUM; ++i) {
-    // Фоновая обстановка по данным локатора:
     pixmap = locators[i].getPixmap();
     QGraphicsItem *itemPixmap = scene.addPixmap(pixmap);
     itemPixmap->setOpacity(0.5);
-    //itemPixmap->setFlag(QGraphicsItem::ItemIsMovable);
+    itemPixmap->setFlag(QGraphicsItem::ItemIsMovable);
+    itemPixmap->setTransformOriginPoint(QPoint(pixmap.width()/2, pixmap.height()/2));
     itemPixmap->setPos(locators[i].getCenter());
+    itemPixmap->setRotation(locators[i].getAngle0());
+  }
 
-    // Текущее направление локатора:
+  // Текущее направление локаторов:
+  for (int i = 0; i < LOCATORS_NUM; ++i) {
     QPoint cnt = locators[i].getCenter() + QPoint(200,200);
     double phi = locators[i].getNextPhi();
+
+    cout << phi << " ";
+    if (i == 1) cout << endl;
+
     double L = 200;
-    scene.addLine(QLineF(cnt,
-                         QPoint(cnt.x() + L*cos(phi), cnt.y() + L*sin(phi))),
-                         QPen(Qt::red, 2));
+    QGraphicsItem *itemLine = scene.addLine(QLineF(0,0,L,L),
+                                            QPen(Qt::red, 2));
+    itemLine->setPos(cnt);
+    itemLine->setRotation(phi);
   }
 
   // Цель:
