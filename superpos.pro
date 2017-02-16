@@ -26,4 +26,6 @@ HEADERS  += widget.h \
     locator.h \
     target.h
 
+LIBS += -lGeographic
+
 FORMS    += widget.ui

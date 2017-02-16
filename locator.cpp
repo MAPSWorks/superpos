@@ -2,11 +2,17 @@
 
 #include <iostream>
 
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+
 using namespace std;
+using namespace GeographicLib;
+
+#define COORDS(h,m,s) (h+m/60+s/3600)
 
 Locator::Locator()
 {
-  pixmap = QPixmap(400,400);
+  pixmap = QPixmap(2*DISCR_NUM, 2*DISCR_NUM);
   pixmap.fill(Qt::transparent);
 }
 
@@ -14,6 +20,22 @@ void Locator::init(QPoint cnt, double ang0)
 {
   center = cnt;
   angle0 = ang0;
+
+  cout << "init" << "\n";
+
+  Geocentric earth(Constants::WGS84_a(), Constants::WGS84_f());
+ // Alternatively: const Geocentric& earth = Geocentric::WGS84();
+ const double lat0 = COORDS(56.0,  8.0, 41.0),
+              lon0 = COORDS(34.0, 59.0, 23.0);
+ LocalCartesian proj(lat0, lon0, 0, earth);
+
+   // Sample forward calculation
+   double lat = COORDS(56.0,  8.0, 49.83),
+          lon = COORDS(34.0, 59.0, 44.07),
+          h = 0; // Calais
+   double x, y, z;
+   proj.Forward(lat, lon, h, x, y, z);
+   cout << x << " " << y << " " << z << "\n";
 }
 
 void Locator::addBackground(const char * filename)
@@ -38,24 +60,25 @@ void Locator::updatePixmap()
 
   painter.begin(&pixmap);
   painter.setRenderHint(QPainter::Antialiasing);
-  painter.translate(200,200);
-  painter.scale(0.1, 0.1);
+  painter.translate(pixmap.width()/2, pixmap.height()/2);
+
+  painter.scale(METERS_IN_DISCR, METERS_IN_DISCR);
 
   for (DataCont::iterator it = data.begin(); it != data.end(); ++it) {
 
     painter.rotate(it->data.line_pos.pos * POS_TO_GRAD);
 
     int step = 1;
-    for (int i = 0; i < 1000/*DATA_LEN_SPECTR_4K*/; i++) {
+    for (int i = 0; i < DISCR_NUM; i++) {
       float x = it->data.out_data.spectr[i];
-      int col = pow(0.9 * x, 0.8);
+      int col = pow(1.0 * x, 0.8);
 
       if (col < 0)   col = 0;
       if (col > 255) col = 255;
 
       painter.setPen( QPen(QColor(col,col,col), 50, Qt::SolidLine) );
 
-      painter.drawLine(i*step,i*step, (i+1)*step,(i+1)*step);
+      painter.drawLine(i*step,0, (i+1)*step,0);
     }
 
     painter.rotate(- it->data.line_pos.pos * POS_TO_GRAD);

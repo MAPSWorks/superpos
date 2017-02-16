@@ -35,11 +35,14 @@ class Drawer : public QObject
     void setAngle0_RLS1(int val) {locators[0].setAngle0(val);}
     void setAngle0_RLS2(int val) {locators[1].setAngle0(val);}
 
+    void setOpacity(int val) {opacity = (double) val / 100;}
+
   private:
     QPixmap pixmap;
     QGraphicsScene scene, background;
     QTime time;
     QGraphicsItem *item;
+    double opacity;
 
     Locator locators[LOCATORS_NUM];
     std::vector<Target> targets;

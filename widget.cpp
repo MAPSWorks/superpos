@@ -13,14 +13,17 @@ Widget::Widget():
   view = new QGraphicsView(this);
   view -> setGeometry(20,20,800,600);
   view -> setScene(&drawer.getScene());
+  view -> scale(0.12, 0.12);
 
   drawer.init();
 
   connect(ui->spinBoxR1, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS1(int)));
   connect(ui->spinBoxR2, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS2(int)));
+  connect(ui->hSlider1, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacity(int)));
 
-
-
+  drawer.setAngle0_RLS1(ui->spinBoxR1->value());
+  drawer.setAngle0_RLS2(ui->spinBoxR2->value());
+  drawer.setOpacity(ui->hSlider1->value());
 
   connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
   timer.start(DELTA_T * 1000);
