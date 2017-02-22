@@ -1,11 +1,11 @@
 #include "target.h"
 
-Target::Target(QPoint c0, QPoint v):
+Target::Target(QPointF c0, QPointF v):
   coord0(c0), vel(v), startTime(0)
 {
 }
 
-QPoint Target::getCoords(double time)
+QPointF Target::getCoords(double time)
 {
   return coord0 + vel * (time - startTime);
 }

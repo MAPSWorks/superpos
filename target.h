@@ -1,18 +1,18 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include <QPoint>
+#include <QPointF>
 
 class Target
 {
   public:
-    Target(QPoint, QPoint);
-    QPoint getCoords(double);
+    Target(QPointF, QPointF);
+    QPointF getCoords(double);
 
   private:
     double startTime;
-    QPoint coord0,
-           vel;
+    QPointF coord0,
+            vel;
 };
 
 #endif // TARGET_H

@@ -29,7 +29,7 @@
     <number>180</number>
    </property>
    <property name="value">
-    <number>-135</number>
+    <number>44</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="spinBoxR2">
@@ -48,7 +48,7 @@
     <number>180</number>
    </property>
    <property name="value">
-    <number>50</number>
+    <number>98</number>
    </property>
   </widget>
   <widget class="QLabel" name="label">

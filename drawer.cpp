@@ -17,13 +17,13 @@ void Drawer::init()
 {
   scene.setSceneRect(-3000, -3000, 6000, 6000);
 
-  opacity = 0.5;
+  opacity[0] = opacity[1] = 0.5;
 
- locators[0].init(QPoint( 363.8,  272.7), 0);
- locators[1].init(QPoint(-566.4, -352.4), 0);
+ locators[0].init(QPointF( 363.8,  272.7 * -1), 0);
+ locators[1].init(QPointF(-566.4, -352.4 * -1), 0);
 
- // locators[0].init(QPoint(0, 0), 0);
- // locators[1].init(QPoint(0, 0), 0);
+ // locators[0].init(QPointF(0, 0), 0);
+ // locators[1].init(QPointF(0, 0), 0);
 
   locators[0].addBackground("/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b");
   locators[1].addBackground("/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_4_fileRLS_FFT_001.b");
@@ -31,8 +31,8 @@ void Drawer::init()
   for (int i = 0; i < LOCATORS_NUM; ++i)
     locators[i].updatePixmap();
 
-  targets.push_back(Target(QPoint(281.51, -256.59),
-                           QPoint((-458.44-281.51) / 50,  (54.49+256.59) / 50)));
+  targets.push_back(Target(QPointF(281.51, -256.59),
+                           QPointF((-458.44-281.51) / 50,  (54.49+256.59) / 50)));
 
   time.start();
 
@@ -41,7 +41,7 @@ void Drawer::init()
 
 void Drawer::process()
 {
-  QPoint crd = targets[0].getCoords(0.001*time.elapsed());
+  QPointF crd = targets[0].getCoords(0.001*time.elapsed());
 
   scene.clear();
 
@@ -49,10 +49,10 @@ void Drawer::process()
   for (int i = 0; i < LOCATORS_NUM; ++i) {
     pixmap = locators[i].getPixmap();
     QGraphicsItem *itemPixmap = scene.addPixmap(pixmap);
-    itemPixmap->setOpacity(opacity);
+    itemPixmap->setOpacity(opacity[i]);
     //itemPixmap->setFlag(QGraphicsItem::ItemIsMovable);
-    itemPixmap->setTransformOriginPoint(QPoint(pixmap.width()/2, pixmap.height()/2));
-    itemPixmap->setPos(locators[i].getCenter() - QPoint(pixmap.width()/2, pixmap.height()/2));
+    itemPixmap->setTransformOriginPoint(QPointF(pixmap.width()/2, pixmap.height()/2));
+    itemPixmap->setPos(locators[i].getCenter() - QPointF(pixmap.width()/2, pixmap.height()/2));
     itemPixmap->setRotation(locators[i].getAngle0());
 
     // Для контроля масштабов:
@@ -65,14 +65,14 @@ void Drawer::process()
   // Центр (КПА)
   scene.addEllipse(-5, -5, 10, 10, QPen(Qt::red, 5));
   // ВПП
-  scene.addLine(QLineF( 281.51, -256.59,
-                       -458.44,  54.49),
+  scene.addLine(QLineF(QPointF(281.51, 54.49 * -1),
+                       QPointF(-458.44, -256.59 * -1)),
                 QPen(Qt::cyan, 5));
 
-#if 1
+#if 0
   // Текущее направление локаторов:
   for (int i = 0; i < LOCATORS_NUM; ++i) {
-    QPoint cnt = locators[i].getCenter();
+    QPointF cnt = locators[i].getCenter();
     double phi = locators[i].getNextPhi();
 
     // cout << phi << " ";

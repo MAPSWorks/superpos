@@ -20,13 +20,13 @@ class Locator
   public:
     Locator();
 
-    void init(QPoint, double);
+    void init(QPointF, double);
     void addBackground(const char*);
     void addTarget();
     void updatePixmap();
 
     const QPixmap& getPixmap() {return pixmap;}
-    const QPoint&  getCenter() {return center;}
+    const QPointF&  getCenter() {return center;}
     void     setAngle0(double a) {angle0 = a;}
     double   getAngle0() {return angle0;}
     double   getNextPhi();
@@ -36,7 +36,7 @@ class Locator
     QPixmap  pixmap;
     Parser   parser;
 
-    QPoint center; // Координаты центра
+    QPointF center; // Координаты центра
     double angle0, // Смещение азимута
            phi;    // Текущий азимут
 };

@@ -16,7 +16,7 @@ Locator::Locator()
   pixmap.fill(Qt::transparent);
 }
 
-void Locator::init(QPoint cnt, double ang0)
+void Locator::init(QPointF cnt, double ang0)
 {
   center = cnt;
   angle0 = ang0;
@@ -73,10 +73,12 @@ void Locator::updatePixmap()
       float x = it->data.out_data.spectr[i];
       int col = pow(1.0 * x, 0.8);
 
-      if (col < 0)   col = 0;
       if (col > 255) col = 255;
+      QColor color(col, col, col);
 
-      painter.setPen( QPen(QColor(col,col,col), 50, Qt::SolidLine) );
+      if (col < 2) color = Qt::transparent;
+
+      painter.setPen( QPen(color, 20, Qt::SolidLine) );
 
       painter.drawLine(i*step,0, (i+1)*step,0);
     }
