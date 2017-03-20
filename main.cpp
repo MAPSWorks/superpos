@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "drawer.h"
+#include "mapviewer.h"
 
 #include <QApplication>
 #include <QWidget>
@@ -13,6 +14,10 @@ int main(int argc, char *argv[])
 
   Widget wgt;
   wgt.setGeometry(20,20,1000,700);
+
+  Mapviewer mv(&wgt);
+  mv.resize(380, 565);
+  mv.show();
 
   wgt.show();
 
