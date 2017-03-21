@@ -3,6 +3,12 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include <iostream>
+
+#define COORDS(h,m,s) (h+m/60+s/3600)
+
+using namespace std;
+
 /*!
  * \example mapviewer.cpp
  * This application is just a simple map viewer. A Mapadapter is created (OpenStreetmaps) 
@@ -13,28 +19,35 @@
  * You can find this example here: QMapControl/Samples/Mapviewer
  * \image html sample_mapviewer.png "screenshot"
  */
-Mapviewer::Mapviewer(QWidget *parent)
-    : QWidget(parent)
+Mapviewer::Mapviewer(QWidget * wgt)
 {
     // create MapControl
-    mc = new MapControl(QSize(380, 540));
+    mc = new MapControl(wgt);
+
+    mc->resize(wgt->size());
+
     mc->showScale(true);
 
     // create mapadapter, for mainlayer and overlay
     mapadapter = new OSMMapAdapter();
 
     // create a layer with the mapadapter and type MapLayer
-    mainlayer = new MapLayer("OpenStreetMap-Layer", mapadapter);
+    mainlayer = new MapLayer("OpenStreetMap-Layer", mapadapter, false);
 
     // add Layer to the MapControl
     mc->addLayer(mainlayer);
 
     addZoomButtons();
 
-    mc->setView(QPointF(0,0));
-    mc->setZoom(2);
+    mc->setView(QPointF(
+                    COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)
+                    // 0, 0
+               ));
+    mc->setZoom(12);
+}
 
-    mc->show();
+Mapviewer::~Mapviewer()
+{
 }
 
 void Mapviewer::addZoomButtons()
@@ -57,12 +70,12 @@ void Mapviewer::addZoomButtons()
     mc->setLayout(innerlayout);
 }
 
-Mapviewer::~Mapviewer()
-{
-}
-
 // resize the widget 
 void Mapviewer::resizeEvent ( QResizeEvent * event )	
 {
-    mc->resize(event->size());
+  cout << "Coords: " << mc->currentCoordinate().rx() << ", "
+                     << mc->currentCoordinate().ry() << endl;
+  cout << "currentZoom = " << mapadapter->currentZoom() << endl;
+
+  mc->resize(event->size());
 }

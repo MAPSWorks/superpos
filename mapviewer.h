@@ -8,12 +8,12 @@
 #include <QMapControl/maplayer.h>
 
 using namespace qmapcontrol;
-class Mapviewer : public QWidget
+class Mapviewer : public QObject
 {
     Q_OBJECT
 
 public:
-    Mapviewer(QWidget *parent = 0);
+    Mapviewer(QWidget*);
 
     ~Mapviewer();
 

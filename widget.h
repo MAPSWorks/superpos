@@ -11,6 +11,7 @@
 #include <QGraphicsView>
 
 #include "drawer.h"
+#include "mapviewer.h"
 
 namespace Ui {
   class Widget;

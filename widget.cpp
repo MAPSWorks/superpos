@@ -12,10 +12,12 @@ Widget::Widget():
 
   view = new QGraphicsView(this);
   view -> setGeometry(20,20,800,600);
+
+  Mapviewer mv(view);
+
   view -> setScene(&drawer.getScene());
   view -> scale(0.12, 0.12);
-  view -> setBackgroundBrush(Qt::black);
-
+  // view -> setBackgroundBrush(Qt::black);
 
   drawer.init();
 
