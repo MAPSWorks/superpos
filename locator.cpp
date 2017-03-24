@@ -12,7 +12,7 @@ using namespace GeographicLib;
 
 Locator::Locator()
 {
-  pixmap = QPixmap(2*DISCR_NUM, 2*DISCR_NUM);
+  pixmap = QPixmap(2*DISCR_NUM*SCALE, 2*DISCR_NUM*SCALE);
   pixmap.fill(Qt::transparent);
 }
 
@@ -62,7 +62,7 @@ void Locator::updatePixmap()
   painter.setRenderHint(QPainter::Antialiasing);
   painter.translate(pixmap.width()/2, pixmap.height()/2);
 
-  painter.scale(METERS_IN_DISCR, METERS_IN_DISCR);
+  painter.scale(METERS_IN_DISCR*SCALE, METERS_IN_DISCR*SCALE);
 
   for (DataCont::iterator it = data.begin(); it != data.end(); ++it) {
 

@@ -11,13 +11,11 @@ Widget::Widget():
   ui->setupUi(this);
 
   view = new QGraphicsView(this);
-  view -> setGeometry(20,20,800,600);
 
-  Mapviewer mv(view);
-
-  view -> setScene(&drawer.getScene());
-  view -> scale(0.12, 0.12);
-  // view -> setBackgroundBrush(Qt::black);
+  view->setGeometry(20,20,800,600);
+  view->setScene(&drawer.getScene());
+  view->scale(0.6, 0.6);
+  view->setBackgroundBrush(Qt::black);
 
   drawer.init();
 
@@ -25,14 +23,19 @@ Widget::Widget():
   connect(ui->spinBoxR2, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS2(int)));
   connect(ui->hSlider1, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacity_RLS1(int)));
   connect(ui->hSlider2, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacity_RLS2(int)));
+  connect(ui->hSliderM, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacityMap(int)));
 
   drawer.setAngle0_RLS1(ui->spinBoxR1->value());
   drawer.setAngle0_RLS2(ui->spinBoxR2->value());
   drawer.setOpacity_RLS1(ui->hSlider1->value());
   drawer.setOpacity_RLS2(ui->hSlider2->value());
+  drawer.setOpacityMap(ui->hSliderM->value());
 
   connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
+
   timer.start(DELTA_T * 1000);
+
+  drawer.process();
 }
 
 Widget::~Widget()
