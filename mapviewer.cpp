@@ -31,7 +31,7 @@ Mapviewer::Mapviewer(QWidget *parent):
     mc->showScale(true);
 
     // create mapadapter, for mainlayer and overlay
-    mapadapter = new OSMMapAdapter();
+    mapadapter = new GoogleMapAdapter(GoogleMapAdapter::satellite);
 
     // create a layer with the mapadapter and type MapLayer
     mainlayer = new MapLayer("OpenStreetMap-Layer", mapadapter);
