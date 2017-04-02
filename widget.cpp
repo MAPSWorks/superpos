@@ -10,57 +10,34 @@ Widget::Widget():
 {
   ui->setupUi(this);
 
-  view = new QGraphicsView(this);
+  mv = new Mapviewer(this);
+  mv->setGeometry(10,10,700,500);
 
-  view->setGeometry(20,20,800,600);
-  view->setScene(&drawer.getScene());
-  view->scale(0.6, 0.6);
-  view->setBackgroundBrush(Qt::black);
+  sb_loc_num = new QSpinBox(this);
+  sb_loc_num->setGeometry(800,50, 50,25);
+  sb_loc_num->setValue(2);
 
-  drawer.init();
+  for (int i = 0; i < LOCATORS_NUM; ++i) {
+    tb_filename[i] = new QTextBrowser(this);
+    tb_filename[i]->setGeometry(720,100+i*30, 150,25);
 
-  connect(ui->spinBoxR1, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS1(int)));
-  connect(ui->spinBoxR2, SIGNAL(valueChanged(int)), &drawer, SLOT(setAngle0_RLS2(int)));
-  connect(ui->hSlider1, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacity_RLS1(int)));
-  connect(ui->hSlider2, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacity_RLS2(int)));
-  connect(ui->hSliderM, SIGNAL(valueChanged(int)), &drawer, SLOT(setOpacityMap(int)));
+    sb_init_az[i] = new QSpinBox(this);
+    sb_init_az[i]->setGeometry(890,100+i*30, 50,25);
 
-  drawer.setAngle0_RLS1(ui->spinBoxR1->value());
-  drawer.setAngle0_RLS2(ui->spinBoxR2->value());
-  drawer.setOpacity_RLS1(ui->hSlider1->value());
-  drawer.setOpacity_RLS2(ui->hSlider2->value());
-  drawer.setOpacityMap(ui->hSliderM->value());
+    sb_scan_num[i] = new QSpinBox(this);
+    sb_scan_num[i]->setGeometry(950,100+i*30, 50,25);
+  }
+  pb_update = new QPushButton(this);
+  pb_update->setGeometry(800, 300, 100,25);
+  pb_update->setText("Update");
 
-  connect(&timer, SIGNAL(timeout()), &drawer, SLOT(process()));
-
+  connect(pb_update, SIGNAL(released()), mv, SLOT(updateLocators()));
+  connect(&timer, SIGNAL(timeout()), mv, SLOT(updateTargets()));
   timer.start(DELTA_T * 1000);
-
-  drawer.process();
 }
 
 Widget::~Widget()
 {
+  delete mv;
   delete ui;
-}
-
-void Widget::paintEvent(QPaintEvent*) {
-  /* void */
-}
-
-void Widget::wheelEvent(QWheelEvent *event)
-{
-   switch(event->modifiers())
-   {
-     case Qt::ControlModifier: {
-       if (event->delta() > 0) {
-         view->scale(1.1, 1.1);
-       }
-       else {
-         view->scale(0.9, 0.9);
-       }
-     }
-     default:
-       break;
-   }
-   event->accept();
 }

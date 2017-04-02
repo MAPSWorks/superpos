@@ -6,11 +6,11 @@
 #include <QTimer>
 #include <QWheelEvent>
 #include <QMouseEvent>
+#include <QSpinBox>
+#include <QPushButton>
+#include <QTextBrowser>
 #include <QtMath>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 
-#include "drawer.h"
 #include "mapviewer.h"
 
 namespace Ui {
@@ -21,23 +21,23 @@ class Widget : public QWidget
 {
   Q_OBJECT
 
-  protected:
-     void paintEvent(QPaintEvent *);
-     void wheelEvent(QWheelEvent *);
-
   public:
     Widget();
     ~Widget();
 
   private:
     Ui::Widget *ui;
-    Drawer drawer;
-    QTimer timer;
-    QGraphicsScene *scene;
-    QGraphicsView  *view;
+    Mapviewer *mv;
 
-  public slots:
-    void onUpdateScreen() { view->update(); /*cout << "update" << endl;*/ }
+    QPushButton *pb_update;
+    QSpinBox *sb_loc_num;
+    QSpinBox *sb_scan_num[LOCATORS_NUM];
+    QSpinBox *sb_init_az[LOCATORS_NUM];
+    QTextBrowser *tb_filename[LOCATORS_NUM];
+
+    QTimer timer;
+
+
 };
 
 #endif // WIDGET_H

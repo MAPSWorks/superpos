@@ -11,8 +11,15 @@
 #include <QMapControl/googleapimapadapter.h>
 #include <QMapControl/maplayer.h>
 #include <QMapControl/geometrylayer.h>
+#include <QMapControl/linestring.h>
+
+#include "locator.h"
+#include "target.h"
+
+#define LOCATORS_NUM 2
 
 using namespace qmapcontrol;
+
 class Mapviewer : public QWidget
 {
     Q_OBJECT
@@ -22,16 +29,28 @@ public:
 
     ~Mapviewer();
 
+
+public slots:
+    void updateLocators();
+    void updateTargets();
+
 private:
     MapControl* mc;
     MapAdapter* mapadapter;
     Layer* mainlayer;
+    Layer* loclayer;
+    Layer* targlayer;
     Layer* notes;
+
+    Locator locators[LOCATORS_NUM];
+    Targets targets;
 
     void addZoomButtons();
 
+
 protected:
-    virtual void resizeEvent ( QResizeEvent * event );
+    virtual void resizeEvent(QResizeEvent * event);
+    virtual void paintEvent(QPaintEvent * event);
 };
 
 #endif

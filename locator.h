@@ -4,11 +4,13 @@
 #include <QPainter>
 #include <QPixmap>
 #include <vector>
+#include <iostream>
 
 #include "parser.h"
+#include "target.h"
 
 #define DATA_NUM_ONE_ROUND 750  ///< Количество сообщений, составляющее один обзор
-#define DELTA_T            0.5  ///< Период обновления экрана
+#define DELTA_T            1.0  ///< Период обновления экрана
 #define TIME_ONE_ROUND     2.0  ///< Время одного обзора каждого локатора
 #define DISCR_NUM          2500 ///< Число отображаемых квантов дальности
 #define METERS_IN_DISCR    0.79 ///< Метров в одном кванте
@@ -20,10 +22,12 @@ class Locator
 {
   public:
     Locator();
+    ~Locator();
 
     void init(QPointF, double);
     void addBackground(const char*);
-    void addTarget();
+    void writeToFile(Targets&);
+    void closeFile() {file.close(); std::cout << "closed" << std::endl;}
     void updatePixmap();
 
     const QPixmap& getPixmap() {return pixmap;}
@@ -36,6 +40,8 @@ class Locator
     DataCont data;
     QPixmap  pixmap;
     Parser   parser;
+    DataCont::iterator it_data;
+    std::ofstream      file;
 
     QPointF center; // Координаты центра
     double angle0, // Смещение азимута

@@ -14,6 +14,13 @@ Locator::Locator()
 {
   pixmap = QPixmap(2*DISCR_NUM*SCALE, 2*DISCR_NUM*SCALE);
   pixmap.fill(Qt::transparent);
+
+  file.open("RLS_Data_New.b", ios_base::binary | ios_base::out);
+}
+
+Locator::~Locator()
+{
+  closeFile();
 }
 
 void Locator::init(QPointF cnt, double ang0)
@@ -52,6 +59,67 @@ void Locator::addBackground(const char * filename)
     data.push_back(parser.getData());
   }
 
+  it_data = data.begin();
+}
+
+void Locator::writeToFile(Targets& targets)
+{
+  QPointF targ = targets.front().getCoords() - getCenter();
+  targ.setY(-targ.ry());
+  unsigned dist_discr = sqrt(targ.rx() * targ.rx() + targ.ry() * targ.ry())
+                        * 72223.822090 / METERS_IN_DISCR;
+  double targ_phi = 180.0 / 3.14 * atan(targ.ry() / targ.rx());
+  if (targ.rx() < 0) targ_phi += 180.0;
+
+  cout << "local_crd: " << targ.rx() << " " << targ.ry() << endl;
+  cout << "line angle = " << it_data->data.line_pos.pos * POS_TO_GRAD
+       << ", discr = " << dist_discr
+       << ", targ_phi = " << targ_phi
+       << ", phi = " << phi << endl;
+
+  while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - phi) > 1.0)
+  {
+    DATA_PACKAGE_AD d = *it_data;
+
+    if ((fabs(it_data->data.line_pos.pos * POS_TO_GRAD + angle0 - targ_phi) < 3.0)
+        && (dist_discr < 4095))
+    {
+      cout << targ_phi << " " << dist_discr << endl;
+
+      d.data.out_data.spectr[dist_discr-5] = 100000;
+      d.data.out_data.spectr[dist_discr-4] = 100000;
+      d.data.out_data.spectr[dist_discr-3] = 100000;
+      d.data.out_data.spectr[dist_discr-2] = 100000;
+      d.data.out_data.spectr[dist_discr-1] = 100000;
+      d.data.out_data.spectr[dist_discr]   = 100000;
+      d.data.out_data.spectr[dist_discr+1] = 100000;
+      d.data.out_data.spectr[dist_discr+2] = 100000;
+      d.data.out_data.spectr[dist_discr+3] = 100000;
+      d.data.out_data.spectr[dist_discr+4] = 100000;
+      d.data.out_data.spectr[dist_discr+5] = 100000;
+
+    /*  d.data.out_data.spectr[1000] = 100000;
+      d.data.out_data.spectr[1001] = 100000;
+      d.data.out_data.spectr[1002] = 100000;
+      d.data.out_data.spectr[1003] = 100000;
+      d.data.out_data.spectr[1004] = 100000;
+      d.data.out_data.spectr[1005] = 100000;
+      d.data.out_data.spectr[1006] = 100000;
+      d.data.out_data.spectr[1007] = 100000;
+      d.data.out_data.spectr[1008] = 100000;
+      d.data.out_data.spectr[1009] = 100000;
+      d.data.out_data.spectr[1010] = 100000;
+      d.data.out_data.spectr[1011] = 100000; */
+
+  }
+
+    file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
+
+    it_data++;
+    if (it_data == data.end()) {
+      it_data = data.begin();
+    }
+  }
 }
 
 void Locator::updatePixmap()

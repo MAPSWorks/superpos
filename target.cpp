@@ -3,9 +3,11 @@
 Target::Target(QPointF c0, QPointF v):
   coord0(c0), vel(v), startTime(0)
 {
+  time.start();
 }
 
-QPointF Target::getCoords(double time)
+QPointF Target::getCoords()
 {
-  return coord0 + vel * (time - startTime);
+  double t = 0.001 * time.elapsed();
+  return coord0 + vel * (t - startTime);
 }
