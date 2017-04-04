@@ -13,184 +13,56 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <widget class="QSpinBox" name="spinBoxR1">
+  <widget class="QPushButton" name="pbUpdate">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>620</y>
-     <width>51</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>-180</number>
-   </property>
-   <property name="maximum">
-    <number>180</number>
-   </property>
-   <property name="value">
-    <number>44</number>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="spinBoxR2">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>620</y>
-     <width>51</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>-180</number>
-   </property>
-   <property name="maximum">
-    <number>180</number>
-   </property>
-   <property name="value">
-    <number>98</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>620</y>
-     <width>131</width>
-     <height>16</height>
+     <x>760</x>
+     <y>370</y>
+     <width>140</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
-    <string>Смещение азимута</string>
+    <string>Обновить</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QPushButton" name="pbAddLoc">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>600</y>
-     <width>59</width>
-     <height>15</height>
+     <x>760</x>
+     <y>290</y>
+     <width>140</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
-    <string>РЛС 1</string>
+    <string>Добавить локатор</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
+  <widget class="QPushButton" name="pbDelLoc">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>600</y>
-     <width>59</width>
-     <height>15</height>
+     <x>760</x>
+     <y>330</y>
+     <width>140</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
-    <string>РЛС 2</string>
+    <string>Удалить локаторы</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>680</y>
-     <width>91</width>
-     <height>16</height>
+     <x>680</x>
+     <y>20</y>
+     <width>301</width>
+     <height>251</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Прозрачность</string>
-   </property>
-  </widget>
-  <widget class="QSlider" name="hSlider1">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>660</y>
-     <width>150</width>
-     <height>15</height>
-    </rect>
-   </property>
-   <property name="singleStep">
-    <number>0</number>
-   </property>
-   <property name="value">
-    <number>50</number>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QSlider" name="hSlider2">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>680</y>
-     <width>150</width>
-     <height>15</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>50</number>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QSlider" name="hSliderM">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>700</y>
-     <width>150</width>
-     <height>15</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>50</number>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>660</y>
-     <width>41</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>РЛС 1</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>680</y>
-     <width>41</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>РЛС 2</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_7">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>700</y>
-     <width>41</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Карта</string>
+   <property name="currentIndex">
+    <number>-1</number>
    </property>
   </widget>
  </widget>

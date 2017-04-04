@@ -2,20 +2,10 @@
 
 #include <iostream>
 
-#include <GeographicLib/Geocentric.hpp>
-#include <GeographicLib/LocalCartesian.hpp>
-
 using namespace std;
-using namespace GeographicLib;
-
-#define COORDS(h,m,s) (h+m/60+s/3600)
 
 Locator::Locator()
 {
-  pixmap = QPixmap(2*DISCR_NUM*SCALE, 2*DISCR_NUM*SCALE);
-  pixmap.fill(Qt::transparent);
-
-  file.open("RLS_Data_New.b", ios_base::binary | ios_base::out);
 }
 
 Locator::~Locator()
@@ -23,43 +13,34 @@ Locator::~Locator()
   closeFile();
 }
 
-void Locator::init(QPointF cnt, double ang0)
+void Locator::init(QPointF cnt, const char * filename, int a0)
 {
+  // Начальные установки
   center = cnt;
-  angle0 = ang0;
+  setAngle0(a0);
+  setOpacity(0.8);
 
-  cout << "init" << "\n";
+  loc_wgt.setFilename(filename);
+  loc_wgt.setCoords(cnt);
 
-  Geocentric earth(Constants::WGS84_a(), Constants::WGS84_f());
- // Alternatively: const Geocentric& earth = Geocentric::WGS84();
- const double lat0 = COORDS(56.0,  8.0, 41.0),
-              lon0 = COORDS(34.0, 59.0, 23.0);
- LocalCartesian proj(lat0, lon0, 0, earth);
+  // Инициализация Pixmap
+  pixmap = QPixmap(2*DISCR_NUM*SCALE, 2*DISCR_NUM*SCALE);
+  pixmap.fill(Qt::transparent);
 
-   // Sample forward calculation
-   double lat = COORDS(56.0,  8.0, 49.83),
-          lon = COORDS(34.0, 59.0, 44.07),
-          h = 0; // Calais
-   double x, y, z;
-   proj.Forward(lat, lon, h, x, y, z);
-   cout << x << " " << y << " " << z << "\n";
-}
+  // Открываем файл для выходных данных
+  out_file.open("RLS_Data_New.b", ios_base::binary | ios_base::out);
 
-void Locator::addBackground(const char * filename)
-{
+  // Загрузка данных из файла записи
   parser.openFile(filename);
-
   data.reserve(DATA_NUM_ONE_ROUND);
-
   DATA_PACKAGE_AD d = parser.getData();
   phi = d.data.line_pos.pos * POS_TO_GRAD;
   data.push_back(parser.getData());
-
-  for (int n = 1; n < DATA_NUM_ONE_ROUND; ++n) {
+  for (unsigned n = 1; n < DATA_NUM_ONE_ROUND * getRoundsNum(); ++n)
     data.push_back(parser.getData());
-  }
-
   it_data = data.begin();
+
+  cout << "Locator Init" << endl;
 }
 
 void Locator::writeToFile(Targets& targets)
@@ -71,86 +52,62 @@ void Locator::writeToFile(Targets& targets)
   double targ_phi = 180.0 / 3.14 * atan(targ.ry() / targ.rx());
   if (targ.rx() < 0) targ_phi += 180.0;
 
-  cout << "local_crd: " << targ.rx() << " " << targ.ry() << endl;
+#if 0
   cout << "line angle = " << it_data->data.line_pos.pos * POS_TO_GRAD
        << ", discr = " << dist_discr
        << ", targ_phi = " << targ_phi
        << ", phi = " << phi << endl;
+#endif
 
   while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - phi) > 1.0)
   {
     DATA_PACKAGE_AD d = *it_data;
 
-    if ((fabs(it_data->data.line_pos.pos * POS_TO_GRAD + angle0 - targ_phi) < 3.0)
-        && (dist_discr < 4095))
+    if ((fabs(it_data->data.line_pos.pos * POS_TO_GRAD + angle0 - targ_phi) < 1000 / dist_discr)
+        && (dist_discr < 4090))
     {
-      cout << targ_phi << " " << dist_discr << endl;
-
-      d.data.out_data.spectr[dist_discr-5] = 100000;
-      d.data.out_data.spectr[dist_discr-4] = 100000;
-      d.data.out_data.spectr[dist_discr-3] = 100000;
-      d.data.out_data.spectr[dist_discr-2] = 100000;
-      d.data.out_data.spectr[dist_discr-1] = 100000;
-      d.data.out_data.spectr[dist_discr]   = 100000;
-      d.data.out_data.spectr[dist_discr+1] = 100000;
-      d.data.out_data.spectr[dist_discr+2] = 100000;
-      d.data.out_data.spectr[dist_discr+3] = 100000;
-      d.data.out_data.spectr[dist_discr+4] = 100000;
-      d.data.out_data.spectr[dist_discr+5] = 100000;
-
-    /*  d.data.out_data.spectr[1000] = 100000;
-      d.data.out_data.spectr[1001] = 100000;
-      d.data.out_data.spectr[1002] = 100000;
-      d.data.out_data.spectr[1003] = 100000;
-      d.data.out_data.spectr[1004] = 100000;
-      d.data.out_data.spectr[1005] = 100000;
-      d.data.out_data.spectr[1006] = 100000;
-      d.data.out_data.spectr[1007] = 100000;
-      d.data.out_data.spectr[1008] = 100000;
-      d.data.out_data.spectr[1009] = 100000;
-      d.data.out_data.spectr[1010] = 100000;
-      d.data.out_data.spectr[1011] = 100000; */
-
-  }
-
-    file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
+      for (int i = -5; i < 6; ++i)
+        d.data.out_data.spectr[dist_discr] = 100000;
+    }
+    out_file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
 
     it_data++;
-    if (it_data == data.end()) {
+    if (it_data == data.end())
       it_data = data.begin();
-    }
   }
 }
 
 void Locator::updatePixmap()
 {
+  cout << "updatePixmap" << endl;
+
   QPainter painter;
+
+  pixmap.fill(Qt::transparent);
 
   painter.begin(&pixmap);
   painter.setRenderHint(QPainter::Antialiasing);
   painter.translate(pixmap.width()/2, pixmap.height()/2);
-
   painter.scale(METERS_IN_DISCR*SCALE, METERS_IN_DISCR*SCALE);
+  painter.setOpacity(getOpacity());
+
+  cout << "data size = " << data.size() << ", opacity = " << getOpacity() << endl;
 
   for (DataCont::iterator it = data.begin(); it != data.end(); ++it) {
-
     painter.rotate(it->data.line_pos.pos * POS_TO_GRAD);
-
     int step = 1;
+
     for (int i = 0; i < DISCR_NUM; i++) {
       float x = it->data.out_data.spectr[i];
-      int col = pow(1.0 * x, 0.8);
 
+      int col = pow(1.0 * x, 0.8);
       if (col > 255) col = 255;
       QColor color(col, col, col);
-
       if (col < 2) color = Qt::transparent;
 
       painter.setPen( QPen(color, 20, Qt::SolidLine) );
-
       painter.drawLine(i*step,0, (i+1)*step,0);
     }
-
     painter.rotate(- it->data.line_pos.pos * POS_TO_GRAD);
   }
 

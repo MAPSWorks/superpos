@@ -26,13 +26,11 @@ class Mapviewer : public QWidget
 
 public:
     Mapviewer(QWidget* parent = 0);
-
     ~Mapviewer();
 
-
-public slots:
-    void updateLocators();
-    void updateTargets();
+    void setView(const QPointF& c) {mc->setView(c);}
+    void updateLocators(Locators*);
+    void updateTargets(Targets*);
 
 private:
     MapControl* mc;
@@ -41,9 +39,6 @@ private:
     Layer* loclayer;
     Layer* targlayer;
     Layer* notes;
-
-    Locator locators[LOCATORS_NUM];
-    Targets targets;
 
     void addZoomButtons();
 

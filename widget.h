@@ -8,10 +8,12 @@
 #include <QMouseEvent>
 #include <QSpinBox>
 #include <QPushButton>
-#include <QTextBrowser>
+#include <QMessageBox>
 #include <QtMath>
+#include <list>
 
 #include "mapviewer.h"
+#include "locator.h"
 
 namespace Ui {
   class Widget;
@@ -25,19 +27,21 @@ class Widget : public QWidget
     Widget();
     ~Widget();
 
+  public slots:
+    void addLocator();
+    void deleteLocators();
+    void updateLocators();
+    void updateTargets();
+    void updateTabWidget();
+
   private:
     Ui::Widget *ui;
     Mapviewer *mv;
 
-    QPushButton *pb_update;
-    QSpinBox *sb_loc_num;
-    QSpinBox *sb_scan_num[LOCATORS_NUM];
-    QSpinBox *sb_init_az[LOCATORS_NUM];
-    QTextBrowser *tb_filename[LOCATORS_NUM];
-
     QTimer timer;
 
-
+    Locators locators;
+    Targets targets;
 };
 
 #endif // WIDGET_H

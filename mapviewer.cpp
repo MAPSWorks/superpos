@@ -17,16 +17,6 @@ using namespace std;
 Mapviewer::Mapviewer(QWidget *parent):
   QWidget(parent)
 {
-
-  locators[0].init(QPointF(COORDS(34.0, 59.0, 44.07), COORDS(56.0,  8.0, 49.83)), 44);
-  locators[1].init(QPointF(COORDS(34.0, 58.0, 50.20), COORDS(56.0,  8.0, 29.59)), 98);
-
-  locators[0].addBackground("/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b");
-  locators[1].addBackground("/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_4_fileRLS_FFT_001.b");
-
-  targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
-                           QPointF(-0.0001,  0)));
-
  // create MapControl
   mc = new MapControl(this);
 
@@ -44,7 +34,7 @@ Mapviewer::Mapviewer(QWidget *parent):
   //mc->setDisabled(true);
 
   addZoomButtons();
-
+/*
   QList<QPointF> coords;
   for (int i = 0; i < LOCATORS_NUM; ++i)
     coords << locators[i].getCenter();
@@ -55,7 +45,7 @@ Mapviewer::Mapviewer(QWidget *parent):
                       << coords.last().rx() << " "
                       << coords.last().ry() << " " << endl;
 
-  mc->setView(locators[0].getCenter());
+*/
   mc->setZoom(14);
 
   loclayer = new GeometryLayer("Locators", mapadapter);
@@ -64,37 +54,49 @@ Mapviewer::Mapviewer(QWidget *parent):
   targlayer = new GeometryLayer("Targets", mapadapter);
   mc->addLayer(targlayer);
 
-  updateLocators();
-  updateTargets();
+  //updateLocators();
+  //updateTargets();
 }
 
 Mapviewer::~Mapviewer()
 {
 }
 
-void Mapviewer::updateLocators()
+void Mapviewer::updateLocators(std::list<Locator> *locators)
 {
   if (loclayer == NULL) return;
 
-  locators[0].updatePixmap();
-  locators[1].updatePixmap();
-
-  QTransform tr[LOCATORS_NUM];
-  Point *rls[LOCATORS_NUM];
-
   loclayer->clearGeometries();
 
-  for (int i = 0; i < LOCATORS_NUM; ++i) {
-    tr[i].rotate(locators[i].getAngle0()).scale(0.71,0.71);
-    rls[i] = new Point(locators[i].getCenter().x(),
-                        locators[i].getCenter().y(),
-                        locators[i].getPixmap().transformed(tr[i]),
-                        "rls" + i);
-    loclayer->addGeometry(rls[i]);
+  if (locators->empty()) {
+    mc->update();
+    return;
   }
+
+  Point *rls[10];
+  int i = 0;
+  QPointF cnt;
+  for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
+    QTransform tr;
+    it->updatePixmap();
+    tr.rotate(it->getAngle0()).scale(0.71,0.71);
+    rls[i] = new Point(it->getCenter().x(),
+                      it->getCenter().y(),
+                      it->getPixmap().transformed(tr),
+                      "rls");
+    loclayer->addGeometry(rls[i]);
+    i++;
+    cout << "Mapviewer::addGeometry " << it->getCenter().x()
+                               << " " << it->getCenter().y() << endl;
+    cnt += it->getCenter();
+  }
+  cnt /= locators->size();
+
+  mc->setView(cnt);
+  mc->update();
 }
 
-void Mapviewer::updateTargets()
+void Mapviewer::updateTargets(Targets* targets)
 {
   if (targlayer == NULL) return;
 
@@ -103,19 +105,22 @@ void Mapviewer::updateTargets()
   QTransform tr;
   Point *targ;
 
-  QPointF crd = targets[0].getCoords();
+  QPointF crd = targets->front().getCoords();
 
   targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
   targlayer->addGeometry(targ);
 
-  if (targets[0].getTimeElapsed() < 30.0) {
-    locators[0].writeToFile(targets);
+/*
+  if (targets->front().getTimeElapsed() < 20.0) {
+    locators.writeToFile(targets);
   }
   else {
     locators[0].closeFile();
   }
+*/
 
-  for (int i = 0; i < LOCATORS_NUM; ++i) {
+/*
+    for (int i = 0; i < LOCATORS_NUM; ++i) {
     QPointF cnt = locators[i].getCenter();
     double phi = locators[i].getNextPhi();
 
@@ -130,6 +135,7 @@ void Mapviewer::updateTargets()
 
     //targlayer->addGeometry(line);
   }
+*/
 }
 
 void Mapviewer::addZoomButtons()

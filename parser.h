@@ -1,7 +1,7 @@
 #ifndef DATA_DRAWER_H
 #define DATA_DRAWER_H
 
-#define DATA_OFFSET 64000
+#define DATA_OFFSET 0
 
 #include <QObject>
 #include <fstream>
@@ -12,6 +12,8 @@ class Parser
 {
 public:
   Parser();
+  Parser(const Parser& p) {*this = p;}
+  Parser& operator=(const Parser&) {return *this;}
   ~Parser() {}
 
   void openFile(const char*);
