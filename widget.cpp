@@ -14,11 +14,11 @@ Widget::Widget():
   ui->setupUi(this);
 
   locators.clear();
-/*
+
   locators.push_back(Locator());
   locators.back().init(QPointF(COORDS(34.0, 59.0, 44.07), COORDS(56.0,  8.0, 49.83)),
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 44);
-*/
+
   locators.push_back(Locator());
   locators.back().init(QPointF(COORDS(34.0, 58.0, 50.20), COORDS(56.0,  8.0, 29.59)),
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_4_fileRLS_FFT_001.b", 98);
@@ -35,6 +35,7 @@ Widget::Widget():
   connect(ui->pbDelLoc, SIGNAL(released()), this, SLOT(deleteLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateTabWidget()));
+  connect(ui->pbReset,  SIGNAL(released()), this, SLOT(resetToDefault()));
   //connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
   timer.start(DELTA_T * 1000);
@@ -103,4 +104,10 @@ void Widget::updateTabWidget()
   }
   if (cur <= i)
     ui->tabWidget->setCurrentIndex(cur);
+}
+
+void Widget::resetToDefault()
+{
+  mv->resetView(&locators);
+  mv->updateLocators(&locators);
 }

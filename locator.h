@@ -60,10 +60,10 @@ class Locator
     DataCont::iterator it_data;
     std::ofstream      out_file;
 
-    QPointF center;  // Координаты центра
-    double  angle0,  // Смещение азимута
-            phi;     // Текущий азимут
-    double  opacity; // Прозрачность при отрисовке
+    QPointF  center;  // Координаты центра
+    double   angle0,  // Смещение азимута
+             phi;     // Текущий азимут
+    double   opacity; // Прозрачность при отрисовке
 };
 typedef std::list<Locator> Locators;
 

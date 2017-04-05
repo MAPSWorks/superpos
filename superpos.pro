@@ -30,9 +30,9 @@ HEADERS  += widget.h \
     dialog.h \
     loc_widget.h
 
-#INCLUDEPATH += $${GEOGRAPHIC_INCL}:$${QMAPCONTROL_INCL}
-#LIBS += -L$${GEOGRAPHIC_LIB}:$${QMAPCONTROL_LIB} -lGeographic -lqmapcontrol
-LIBS += -lqmapcontrol
+INCLUDEPATH += $${GEOGRAPHIC_INCL}:$${QMAPCONTROL_INCL}
+LIBS += -L$${GEOGRAPHIC_LIB}:$${QMAPCONTROL_LIB} -lGeographic -lqmapcontrol
+#LIBS += -lqmapcontrol
 
 FORMS    += widget.ui
 

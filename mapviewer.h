@@ -31,6 +31,9 @@ public:
     void setView(const QPointF& c) {mc->setView(c);}
     void updateLocators(Locators*);
     void updateTargets(Targets*);
+    void resetView(Locators*);
+
+    int getZoomLevel() { return mc->currentZoom(); }
 
 private:
     MapControl* mc;
@@ -39,9 +42,13 @@ private:
     Layer* loclayer;
     Layer* targlayer;
     Layer* notes;
+    QLabel* zoomlabel;
 
     void addZoomButtons();
+    void addZoomLabel();
 
+protected slots:
+    void updateViewLabels(const QPointF&, int);
 
 protected:
     virtual void resizeEvent(QResizeEvent * event);

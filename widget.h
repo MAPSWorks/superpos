@@ -33,6 +33,7 @@ class Widget : public QWidget
     void updateLocators();
     void updateTargets();
     void updateTabWidget();
+    void resetToDefault();
 
   private:
     Ui::Widget *ui;

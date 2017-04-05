@@ -2,7 +2,12 @@
 
 #include <iostream>
 
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+#include <GeographicLib/GeodesicLine.hpp>
+
 using namespace std;
+using namespace GeographicLib;
 
 Locator::Locator()
 {
@@ -15,6 +20,19 @@ Locator::~Locator()
 
 void Locator::init(QPointF cnt, const char * filename, int a0)
 {
+/*
+ * Для пересчёта целей
+  Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
+
+  const double lat0 = COORDS(56.0,  8.0, 41.0),
+               lon0 = COORDS(34.0, 59.0, 23.0);
+  double lat = COORDS(56.0,  8.0, 49.83),
+         lon = COORDS(34.0, 59.0, 44.07);
+
+  const GeodesicLine line = geod.InverseLine(lat0, lon0, lat, lon);
+  cout << "Distance = "   << line.Distance()
+       << ", Azimuth = "  << line.Azimuth() << endl;
+*/
   // Начальные установки
   center = cnt;
   setAngle0(a0);
