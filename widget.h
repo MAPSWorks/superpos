@@ -35,6 +35,9 @@ class Widget : public QWidget
     void updateTabWidget();
     void resetToDefault();
 
+    void startImit();
+    void stopImit();
+
   private:
     Ui::Widget *ui;
     Mapviewer *mv;

@@ -14,8 +14,8 @@ InputDialog::InputDialog(QWidget* pwgt/*= 0*/)
     l_lat->setBuddy(lat);
     l_lon->setBuddy(lon);
 
-    QPushButton* pcmdOk     = new QPushButton("&Ok");
-    QPushButton* pcmdCancel = new QPushButton("&Cancel");
+    QPushButton* pcmdOk     = new QPushButton("&OK");
+    QPushButton* pcmdCancel = new QPushButton("&Отмена");
 
     connect(pcmdOk, SIGNAL(clicked()), SLOT(accept()));
     connect(pcmdCancel, SIGNAL(clicked()), SLOT(reject()));

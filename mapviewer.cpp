@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLine>
+#include <QList>
 
 #include <GeographicLib/Geocentric.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
@@ -32,27 +33,12 @@ Mapviewer::Mapviewer(QWidget *parent):
 
   mapadapter = new GoogleMapAdapter(GoogleMapAdapter::satellite);
   mainlayer = new MapLayer("GoogleMapLayer", mapadapter);
-
   mc->addLayer(mainlayer);
 
   //mc->setHidden(true);
   //mc->setDisabled(true);
 
-/*
-  QList<QPointF> coords;
-  for (int i = 0; i < LOCATORS_NUM; ++i)
-    coords << locators[i].getCenter();
-
-  cout << "coords = " << coords.size() << " "
-                      << coords.first().rx() << " "
-                      << coords.first().ry() << " "
-                      << coords.last().rx() << " "
-                      << coords.last().ry() << " " << endl;
-
-*/
-
   addZoomButtons();
-
   mc->setZoom(DEFAULT_ZOOM_LEVEL);
 
   loclayer = new GeometryLayer("Locators", mapadapter);
@@ -74,42 +60,21 @@ void Mapviewer::updateLocators(Locators *locators)
 
   loclayer->clearGeometries();
 
-  Point *rls[10];
-  int i = 0;
-  double sc = 7.4 / pow(2, mc->currentZoom());
-  //double sc = 0.9;
+  double sc = 1.48 / SCALE;
 
-  cout << "scale = " << sc << endl;
   for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
     QTransform tr;
     it->updatePixmap();
-
     tr.rotate(it->getAngle0()).scale(sc, sc);
-    rls[i] = new Point(it->getCenter().x(),
+    Point *rls = new Point(it->getCenter().x(),
                       it->getCenter().y(),
                       it->getPixmap().transformed(tr),
                       "rls");
-    loclayer->addGeometry(rls[i]);
-    i++;
-    cout << "Mapviewer::addGeometry " << it->getCenter().x()
-                               << " " << it->getCenter().y() << endl;
+    rls->setBaselevel(MAX_ZOOM_LEVEL);
+    loclayer->addGeometry(rls);
+    cout << "add Locator on coords " << it->getCenter().x()
+                             << ", " << it->getCenter().y() << endl;
   }
-
-
- /* Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
-
-  QPointF c0 = locators->front().getCenter();
-
-  const GeodesicLine line = geod.Line(c0.x(), c0.y(), 0);
-  double lat, lon;
-  line.Position(1000, lat, lon);
-
-  cout << "Position: " << lat << " " << lon << "\n";
-
-  cout << "coordinateToDisplay: "
-       << mapadapter->coordinateToDisplay(QPointF(lat, lon)).x() -
-          mapadapter->coordinateToDisplay(c0).x() << endl;
-*/
 
   mc->update();
 }
@@ -120,13 +85,30 @@ void Mapviewer::updateTargets(Targets* targets)
 
   targlayer->clearGeometries();
 
-  QTransform tr;
+  // QTransform tr;
   Point *targ;
 
   QPointF crd = targets->front().getCoords();
 
   targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
+
   targlayer->addGeometry(targ);
+
+  /*
+    Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
+
+    QPointF c0 = locators->front().getCenter();
+
+    const GeodesicLine line = geod.Line(c0.x(), c0.y(), 0);
+    double lat, lon;
+    line.Position(1000, lat, lon);
+
+    cout << "Position: " << lat << " " << lon << "\n";
+
+    cout << "coordinateToDisplay: "
+         << mapadapter->coordinateToDisplay(QPointF(lat, lon)).x() -
+            mapadapter->coordinateToDisplay(c0).x() << endl;
+  */
 
 /*
   if (targets->front().getTimeElapsed() < 20.0) {
@@ -136,24 +118,29 @@ void Mapviewer::updateTargets(Targets* targets)
     locators[0].closeFile();
   }
 */
+}
 
-/*
-    for (int i = 0; i < LOCATORS_NUM; ++i) {
-    QPointF cnt = locators[i].getCenter();
-    double phi = locators[i].getNextPhi();
+void Mapviewer::updateLocAzimuths(Locators* locators)
+{
+  for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
+    const QPointF cnt = it->getCenter();
+    const double phi = it->getNextPhi() * GRAD_TO_RAD;
 
-    double L = DISCR_NUM * METERS_IN_DISCR;
+    cout << "phi = " << phi << endl;
 
     QList<Point*> points;
-    points << new Point(cnt.rx(), cnt.ry());
-    points << new Point(cnt.rx() + L * cos(phi),
-                        cnt.ry() + L * sin(phi));
+    points << new Point(cnt.x(), cnt.y());
 
-    //LineString* line = new LineString(points, QPen(QBrush(Qt::red), 3));
+    const double L = DISCR_NUM * METERS_IN_DISCR * SCALE;
+    QPoint disp = mapadapter->coordinateToDisplay(cnt) + QPoint(L*cos(phi), L*sin(phi));
+    QPointF crd = mapadapter->displayToCoordinate(disp);
+    points << new Point(crd.x(), crd.y());
 
-    //targlayer->addGeometry(line);
+    LineString* line = new LineString(points);
+    line->setPen(new QPen(Qt::red));
+
+    targlayer->addGeometry(line);
   }
-*/
 }
 
 void Mapviewer::resetView(Locators *locators)
@@ -180,7 +167,7 @@ void Mapviewer::addZoomButtons()
   zoomout->setMaximumWidth(50);
 
   zoomlabel = new QLabel();
-  zoomlabel->setMaximumSize(QSize(100,100));
+  zoomlabel->setMaximumSize(QSize(100,50));
   zoomlabel->setFont(QFont("Helvetica", 12, 2));
 
   connect(mc, SIGNAL(viewChanged(const QPointF&, int)),
@@ -202,28 +189,14 @@ void Mapviewer::updateViewLabels(const QPointF &, int)
 {
   zoomlabel->setText("Zoom level " +
                       QString::number(mapadapter->adaptedZoom()));
-  //cout << "updateViewLabels" << endl;
 }
 
-// resize the widget 
 void Mapviewer::resizeEvent ( QResizeEvent * event )	
 {
   mc->resize(event->size());
 }
 
 void Mapviewer::paintEvent(QPaintEvent*) {
-  /* void */
 
-  /*cout << "Mapviewer::paintEvent, rect = " << event->region().boundingRect().bottom() << endl;
-
-  QPainter p;
-  p.begin(this);
-
-  p.setRenderHint(QPainter::Antialiasing);
-  p.setPen( QPen(Qt::red, 20, Qt::SolidLine) );
-  p.drawLine(10,10, 100, 100);
-
-  p.end();
-*/
 }
 

@@ -24,8 +24,8 @@ Widget::Widget():
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_4_fileRLS_FFT_001.b", 98);
 
   targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
-                           0.03 * QPointF((COORDS(34.0, 58.0, 56.451) - COORDS(34.0, 59.0, 39.304)),
-                                           COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764))));
+                           0.0 * QPointF((COORDS(34.0, 58.0, 56.451) - COORDS(34.0, 59.0, 39.304)),
+                                          COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764))));
 
   mv = new Mapviewer(this);
   mv->setGeometry(10,10,650,650);
@@ -36,12 +36,14 @@ Widget::Widget():
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateTabWidget()));
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(resetToDefault()));
-  //connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
-  timer.start(DELTA_T * 1000);
+  connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
+  connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
+
+  connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
   updateLocators();
-  //updateTargets();
+  // updateTargets();
   updateTabWidget();
 }
 
@@ -90,6 +92,7 @@ void Widget::updateLocators()
 void Widget::updateTargets()
 {
   mv->updateTargets(&targets);
+  mv->updateLocAzimuths(&locators);
 }
 
 void Widget::updateTabWidget()
@@ -111,3 +114,19 @@ void Widget::resetToDefault()
   mv->resetView(&locators);
   mv->updateLocators(&locators);
 }
+
+void Widget::startImit()
+{
+  cout << __PRETTY_FUNCTION__ << endl;
+  timer.start(DELTA_T * 1000);
+  for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
+    it->start();
+  }
+}
+
+void Widget::stopImit()
+{
+  cout << __PRETTY_FUNCTION__ << endl;
+  timer.stop();
+}
+

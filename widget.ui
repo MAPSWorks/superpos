@@ -78,6 +78,32 @@
     <string>Сброс настроек</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pbStartImit">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>670</y>
+     <width>90</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Старт</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbStopImit">
+   <property name="geometry">
+    <rect>
+     <x>830</x>
+     <y>670</y>
+     <width>90</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Стоп</string>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

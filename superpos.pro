@@ -4,13 +4,17 @@
 #
 #-------------------------------------------------
 
-QT += network
-QT += core gui
+QT += core gui widgets network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+CONFIG += c++11
 
 TARGET = superpos
 TEMPLATE = app
+
+INCLUDEPATH += $(QMAPCONTROL_INCL) $(GEOGRAPHIC_INCL)
+DEPENDPATH += $${INCLUDEPATH}
+
+LIBS += -L$(GEOGRAPHIC_LIB) -L$(QMAPCONTROL_LIB) -lGeographic -lqmapcontrol
 
 SOURCES += main.cpp\
     widget.cpp \
@@ -29,10 +33,6 @@ HEADERS  += widget.h \
     mapviewer.h \
     dialog.h \
     loc_widget.h
-
-INCLUDEPATH += $${GEOGRAPHIC_INCL}:$${QMAPCONTROL_INCL}
-LIBS += -L$${GEOGRAPHIC_LIB}:$${QMAPCONTROL_LIB} -lGeographic -lqmapcontrol
-#LIBS += -lqmapcontrol
 
 FORMS    += widget.ui
 

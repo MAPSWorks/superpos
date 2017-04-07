@@ -12,11 +12,10 @@
 #include <QMapControl/maplayer.h>
 #include <QMapControl/geometrylayer.h>
 #include <QMapControl/linestring.h>
+#include <QMapControl/point.h>
 
 #include "locator.h"
 #include "target.h"
-
-#define LOCATORS_NUM 2
 
 using namespace qmapcontrol;
 
@@ -30,10 +29,11 @@ public:
 
     void setView(const QPointF& c) {mc->setView(c);}
     void updateLocators(Locators*);
+    void updateLocAzimuths(Locators*);
     void updateTargets(Targets*);
     void resetView(Locators*);
 
-    int getZoomLevel() { return mc->currentZoom(); }
+    int getZoomLevel() { return mapadapter->adaptedZoom(); }
 
 private:
     MapControl* mc;
