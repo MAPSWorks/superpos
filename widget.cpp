@@ -38,7 +38,7 @@ Widget::Widget():
   connect(ui->pbDelLoc, SIGNAL(released()), this, SLOT(deleteLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateTabWidget()));
-  connect(ui->pbReset,  SIGNAL(released()), this, SLOT(resetToDefault()));
+  connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
   connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
@@ -100,6 +100,7 @@ void Widget::updateLocators()
     it->setFirstDiscr(sb_first_discr->value());
     it->setLastDiscr(sb_last_discr->value());
     it->setMinAmpl(sb_min_ampl->value());
+    it->setColorInvert(cb_invert_color->checkState());
   }
 
   mv->updateLocators(&locators);
@@ -128,10 +129,9 @@ void Widget::updateTabWidget()
     ui->tabWidget->setCurrentIndex(cur);
 }
 
-void Widget::resetToDefault()
+void Widget::optimizeView()
 {
   mv->resetView(&locators);
-  mv->updateLocators(&locators);
 }
 
 void Widget::startImit()
@@ -169,9 +169,9 @@ void Widget::updateGroupBox()
   sb_last_discr->setValue(2500);
   sb_min_ampl = new QSpinBox();
   sb_min_ampl->setMinimum(0);
-  sb_min_ampl->setMaximum(100);
+  sb_min_ampl->setMaximum(1000);
   sb_min_ampl->setValue(5);
-  cb_auto_update = new QCheckBox();
+  cb_invert_color = new QCheckBox();
 
   QGridLayout *vbox = new QGridLayout;
   vbox->addWidget(sb_first_discr, 0,0);
@@ -180,7 +180,7 @@ void Widget::updateGroupBox()
   vbox->addWidget(new QLabel("Конечный квант дальности"), 1,1);
   vbox->addWidget(sb_min_ampl, 2,0);
   vbox->addWidget(new QLabel("Мин. отображаемая амплитуда"), 2,1);
-  vbox->addWidget(cb_auto_update, 3,0);
-  vbox->addWidget(new QLabel("Авто-обновление локаторов"), 3,1);
+  vbox->addWidget(cb_invert_color, 3,0);
+  vbox->addWidget(new QLabel("Инвертировать цвет"), 3,1);
   ui->groupBox->setLayout(vbox);
 }

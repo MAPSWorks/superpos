@@ -34,7 +34,7 @@ class Widget : public QWidget
     void updateLocators();
     void updateTargets();
     void updateTabWidget();
-    void resetToDefault();
+    void optimizeView();
 
     void startImit();
     void stopImit();
@@ -48,7 +48,7 @@ class Widget : public QWidget
     QSpinBox *sb_first_discr;
     QSpinBox *sb_last_discr;
     QSpinBox *sb_min_ampl;
-    QCheckBox *cb_auto_update;
+    QCheckBox *cb_invert_color;
 
     QTimer timer;
 

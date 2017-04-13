@@ -50,6 +50,7 @@ class Locator
     void     setFirstDiscr(unsigned f) { first_discr = f; }
     void     setLastDiscr(unsigned l) { last_discr = l; }
     void     setMinAmpl(unsigned a) { min_ampl = a; }
+    void     setColorInvert(bool i) { is_color_invert = i; }
 
     double   getNextPhi();
 
@@ -72,6 +73,7 @@ class Locator
     unsigned first_discr, // Начало вывода (дискр. дальн.)
              last_discr,  // Конец вывода (дискр. дальн.)
              min_ampl;    // Минимальная отображаемая амплитуда
+    bool is_color_invert;
 };
 typedef std::list<Locator> Locators;
 

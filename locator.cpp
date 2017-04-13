@@ -41,8 +41,6 @@ void Locator::init(QPointF cnt, const char * filename, int lp0)
   for (unsigned n = 1; n < DATA_NUM_ONE_ROUND * getRoundsNum(); ++n)
     data.push_back(parser.getData());
   it_data = data.begin();
-
-  cout << "Locator Init" << endl;
 }
 
 void Locator::writeToFile(Targets& targets)
@@ -121,8 +119,6 @@ void Locator::setOutFile(const char* name)
 
 void Locator::updatePixmap()
 {
-  cout << "updatePixmap" << endl;
-
   QPainter painter;
 
   pixmap.fill(Qt::transparent);
@@ -147,6 +143,7 @@ void Locator::updatePixmap()
       else {
         int col = pow(1.0 * x, 0.8);
         if (col > 255) col = 255;
+        if (is_color_invert) col = 255 - col;
         color = QColor(col, col, col);
       }
 
