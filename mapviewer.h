@@ -33,6 +33,8 @@ public:
     void updateTargets(Targets*);
     void resetView(Locators*);
 
+    void updatePixmapAzim(int, int);
+
     int getZoomLevel() { return mapadapter->adaptedZoom(); }
 
 private:
@@ -43,6 +45,7 @@ private:
     Layer* targlayer;
     Layer* notes;
     QLabel* zoomlabel;
+    QPixmap pixmap_azim;
 
     void addZoomButtons();
     void addZoomLabel();

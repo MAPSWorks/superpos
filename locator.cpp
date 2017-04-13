@@ -18,24 +18,11 @@ Locator::~Locator()
   closeFile();
 }
 
-void Locator::init(QPointF cnt, const char * filename, int a0)
+void Locator::init(QPointF cnt, const char * filename, int lp0)
 {
-/*
- * Для пересчёта целей
-  Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
-
-  const double lat0 = COORDS(56.0,  8.0, 41.0),
-               lon0 = COORDS(34.0, 59.0, 23.0);
-  double lat = COORDS(56.0,  8.0, 49.83),
-         lon = COORDS(34.0, 59.0, 44.07);
-
-  const GeodesicLine line = geod.InverseLine(lat0, lon0, lat, lon);
-  cout << "Distance = "   << line.Distance()
-       << ", Azimuth = "  << line.Azimuth() << endl;
-*/
   // Начальные установки
   center = cnt;
-  setAngle0(a0);
+  setLinePos0(lp0);
   setOpacity(0.8);
 
   loc_wgt.setFilename(filename);
@@ -44,9 +31,6 @@ void Locator::init(QPointF cnt, const char * filename, int a0)
   // Инициализация Pixmap
   pixmap = QPixmap(2*DISCR_NUM*SCALE, 2*DISCR_NUM*SCALE);
   pixmap.fill(Qt::transparent);
-
-  // Открываем файл для выходных данных
-  out_file.open("RLS_Data_New.b", ios_base::binary | ios_base::out);
 
   // Загрузка данных из файла записи
   parser.openFile(filename);
@@ -63,12 +47,42 @@ void Locator::init(QPointF cnt, const char * filename, int a0)
 
 void Locator::writeToFile(Targets& targets)
 {
-  QPointF targ = targets.front().getCoords() - getCenter();
-  targ.setY(-targ.ry());
-  unsigned dist_discr = sqrt(targ.rx() * targ.rx() + targ.ry() * targ.ry())
-                        * 72223.822090 / METERS_IN_DISCR;
-  double targ_phi = 180.0 / 3.14 * atan(targ.ry() / targ.rx());
-  if (targ.rx() < 0) targ_phi += 180.0;
+  //QPointF targ = targets.front().getCoords() - getCenter();
+
+  Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
+
+  double lat = targets.front().getCoords().x(),
+         lon = targets.front().getCoords().y();
+  double lat0 = getCenter().x(),
+         lon0 = getCenter().y();
+
+  cout << "Locator: " << lat0 << ", " << lon0 << endl;
+  cout << "Target: "  << lat  << ", " << lon  << endl;
+
+  const GeodesicLine line = geod.InverseLine(lat0, lon0, lat, lon);
+
+  double dist, azim1, azim2, red_l;
+  //const GeodesicLine line =
+
+  geod.Inverse(lat0, lon0, lat, lon, dist, azim1, azim2, red_l);
+
+  cout << "Distance = "   << line.Distance() << " " << dist << endl;
+  cout << ", Azimuth = "  << line.Azimuth() << " " << azim1 << " " << azim2 << endl;
+  cout << ", Red length = "  << red_l << endl;
+
+  //targ.setY(-targ.ry());
+ //unsigned dist_discr = sqrt(targ.rx() * targ.rx() + targ.ry() * targ.ry()) * 72223.822090 / METERS_IN_DISCR;
+
+  unsigned dist_discr = line.Distance() / METERS_IN_DISCR;
+
+  // double targ_phi = 180.0 / 3.14 * atan(targ.ry() / targ.rx());
+  double targ_phi = -line.Azimuth();
+
+  // if (targ.rx() < 0) targ_phi += 180.0;
+  if (targ_phi < 0) targ_phi += 360.0;
+
+  cout << "dist_discr = "   << dist_discr
+       << ", targ_phi = "  << targ_phi << endl;
 
 #if 0
   cout << "line angle = " << it_data->data.line_pos.pos * POS_TO_GRAD
@@ -77,15 +91,17 @@ void Locator::writeToFile(Targets& targets)
        << ", phi = " << phi << endl;
 #endif
 
-  while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - phi) > 1.0)
+  while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - phi) > 1000.0 / dist_discr)
   {
     DATA_PACKAGE_AD d = *it_data;
 
-    if ((fabs(it_data->data.line_pos.pos * POS_TO_GRAD + angle0 - targ_phi) < 1000 / dist_discr)
-        && (dist_discr < 4090))
+    if ((fabs((it_data->data.line_pos.pos + getLinePos0()) * POS_TO_GRAD - targ_phi) < 3)
+        && (dist_discr < DISCR_NUM) && (dist_discr > 10.0))
     {
-      for (int i = -5; i < 6; ++i)
-        d.data.out_data.spectr[dist_discr] = 100000;
+
+      for (int i = -10; i < 11; ++i)
+        d.data.out_data.spectr[dist_discr + i] = 1000000;
+
     }
     out_file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
 
@@ -93,6 +109,14 @@ void Locator::writeToFile(Targets& targets)
     if (it_data == data.end())
       it_data = data.begin();
   }
+}
+
+void Locator::setOutFile(const char* name)
+{
+  if (out_file.is_open())
+    out_file.close();
+  out_file.open(name, ios_base::binary | ios_base::out);
+
 }
 
 void Locator::updatePixmap()
@@ -109,24 +133,27 @@ void Locator::updatePixmap()
   painter.scale(METERS_IN_DISCR*SCALE, METERS_IN_DISCR*SCALE);
   painter.setOpacity(getOpacity());
 
-  cout << "data size = " << data.size() << ", opacity = " << getOpacity() << endl;
-
   for (DataCont::iterator it = data.begin(); it != data.end(); ++it) {
-    painter.rotate(it->data.line_pos.pos * POS_TO_GRAD);
-    int step = 1;
+    double angle = (it->data.line_pos.pos + getLinePos0()) * POS_TO_GRAD;
+    painter.rotate(angle);
 
-    for (int i = 0; i < DISCR_NUM; i++) {
+    unsigned step = 1;
+    for (unsigned i = first_discr; i < last_discr; i++) {
       float x = it->data.out_data.spectr[i];
+      QColor color;
 
-      int col = pow(1.0 * x, 0.8);
-      if (col > 255) col = 255;
-      QColor color(col, col, col);
-      if (col < 2) color = Qt::transparent;
+      if (x < min_ampl)
+        color = Qt::transparent;
+      else {
+        int col = pow(1.0 * x, 0.8);
+        if (col > 255) col = 255;
+        color = QColor(col, col, col);
+      }
 
       painter.setPen( QPen(color, 20, Qt::SolidLine) );
       painter.drawLine(i*step,0, (i+1)*step,0);
     }
-    painter.rotate(- it->data.line_pos.pos * POS_TO_GRAD);
+    painter.rotate(-angle);
   }
 
   painter.end();
@@ -135,7 +162,7 @@ void Locator::updatePixmap()
 double Locator::getNextPhi()
 {
   phi += 360 * DELTA_T / TIME_ONE_ROUND;
-  if ((angle0 + phi) >= 360)
+  if ((getAngle0() + phi) >= 360)
     phi -= 360;
-  return angle0 + phi;
+  return getAngle0() + phi;
 }

@@ -12,25 +12,37 @@ LocWidget::LocWidget(QWidget *parent) : QWidget(parent)
   sb_rounds_num.setMinimum(1);
   sb_rounds_num.setMaximum(5);
   sb_rounds_num.setValue(1);
-  sb_init_az.setMinimum(-179);
-  sb_init_az.setMaximum(180);
-  sb_init_az.setValue(0);
+  sb_angle0.setMinimum(-179);
+  sb_angle0.setMaximum(180);
+  sb_angle0.setValue(0);
+  sb_linepos0.setMinimum(0);
+  sb_linepos0.setMaximum(4096);
+  sb_linepos0.setValue(0);
   sl_opacity.setOrientation(Qt::Horizontal);
   sl_opacity.setMinimum(0);
   sl_opacity.setMaximum(100);
   sl_opacity.setValue(100);
 
-  mainLayout->addWidget(new QLabel("Нач. азимут: "), 2, 0);
-  mainLayout->addWidget(&sb_init_az, 2, 1);
+  unsigned i(2);
 
-  mainLayout->addWidget(new QLabel("N обзоров: "), 3, 0);
-  mainLayout->addWidget(&sb_rounds_num, 3, 1);
+  mainLayout->addWidget(new QLabel("Смещение севера (0-4095): "), i, 0);
+  mainLayout->addWidget(&sb_linepos0, i, 1);
+  ++i;
 
-  mainLayout->addWidget(new QLabel("Прозрачность:"), 4, 0);
-  mainLayout->addWidget(&sl_opacity, 4, 1);
+  mainLayout->addWidget(new QLabel("Старт вращения, град .: "), i, 0);
+  mainLayout->addWidget(&sb_angle0, i, 1);
+  ++i;
 
-  mainLayout->addWidget(new QLabel("Запись ВКЛ:"), 5, 0);
-  mainLayout->addWidget(&cb_do_write, 5, 1);
+  mainLayout->addWidget(new QLabel("N обзоров: "), i, 0);
+  mainLayout->addWidget(&sb_rounds_num, i, 1);
+  ++i;
+
+  mainLayout->addWidget(new QLabel("Прозрачность:"), i, 0);
+  mainLayout->addWidget(&sl_opacity, i, 1);
+  ++i;
+
+  mainLayout->addWidget(new QLabel("Запись ВКЛ:"), i, 0);
+  mainLayout->addWidget(&cb_do_write, i, 1);
 
   setLayout(mainLayout);
 }

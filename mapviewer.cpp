@@ -6,8 +6,8 @@
 #include <QList>
 
 #include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
-#include <GeographicLib/GeodesicLineExact.hpp>
 
 #include <iostream>
 
@@ -65,7 +65,7 @@ void Mapviewer::updateLocators(Locators *locators)
   for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
     QTransform tr;
     it->updatePixmap();
-    tr.rotate(it->getAngle0()).scale(sc, sc);
+    tr.scale(sc, sc);
     Point *rls = new Point(it->getCenter().x(),
                       it->getCenter().y(),
                       it->getPixmap().transformed(tr),
@@ -90,9 +90,11 @@ void Mapviewer::updateTargets(Targets* targets)
 
   QPointF crd = targets->front().getCoords();
 
-  targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
+ // targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
 
-  targlayer->addGeometry(targ);
+ // targlayer->addGeometry(targ);
+
+
 
   /*
     Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
@@ -120,26 +122,51 @@ void Mapviewer::updateTargets(Targets* targets)
 */
 }
 
+void Mapviewer::updatePixmapAzim(int L, int phi)
+{
+  pixmap_azim = QPixmap(2*L, 2*L);
+  pixmap_azim.fill(Qt::transparent);
+  QPainter painter(&pixmap_azim);
+  painter.translate(pixmap_azim.width()/2, pixmap_azim.height()/2);
+  painter.rotate(phi);
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setPen(QPen(Qt::green, 1, Qt::SolidLine));
+  painter.drawLine(0,0, L,0);
+  painter.end();
+}
+
 void Mapviewer::updateLocAzimuths(Locators* locators)
 {
   for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
     const QPointF cnt = it->getCenter();
-    const double phi = it->getNextPhi() * GRAD_TO_RAD;
+    const double phi = it->getNextPhi();
 
-    cout << "phi = " << phi << endl;
+    //cout << "phi = " << phi << endl;
 
-    QList<Point*> points;
-    points << new Point(cnt.x(), cnt.y());
+    QTransform tr;
+    //tr.rotate(phi).scale(1.48, 1.48);
+    updatePixmapAzim(2000 / pow(2,mapadapter->currentZoom()), phi);
 
-    const double L = DISCR_NUM * METERS_IN_DISCR * SCALE;
-    QPoint disp = mapadapter->coordinateToDisplay(cnt) + QPoint(L*cos(phi), L*sin(phi));
-    QPointF crd = mapadapter->displayToCoordinate(disp);
-    points << new Point(crd.x(), crd.y());
+    Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
 
-    LineString* line = new LineString(points);
-    line->setPen(new QPen(Qt::red));
+    //cout << "angle = " << (it_data->data.line_pos.pos * POS_TO_GRAD + getAngle0()) << endl;
 
-    targlayer->addGeometry(line);
+    const GeodesicLine line = geod.DirectLine(cnt.x(), cnt.y(), 360.0-phi, 500);
+    double lat, lon;
+    line.Position(1000, lat,lon);
+
+    cout << lat << " " << lon << endl;
+
+    Point *targ = new Point(lat, lon, QPixmap("./pub.png"));
+    targlayer->addGeometry(targ);
+
+
+    Point *azim = new Point(cnt.x(), cnt.y(),
+                      pixmap_azim.transformed(tr),
+                      "azim");
+    //azim->setBaselevel(DEFAULT_ZOOM_LEVEL);
+
+    targlayer->addGeometry(azim);
   }
 }
 

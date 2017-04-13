@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QRadioButton>
 #include <QtMath>
 #include <list>
 
@@ -39,8 +40,15 @@ class Widget : public QWidget
     void stopImit();
 
   private:
+    void updateGroupBox();
+
     Ui::Widget *ui;
     Mapviewer *mv;
+
+    QSpinBox *sb_first_discr;
+    QSpinBox *sb_last_discr;
+    QSpinBox *sb_min_ampl;
+    QCheckBox *cb_auto_update;
 
     QTimer timer;
 
