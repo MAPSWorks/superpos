@@ -39,10 +39,13 @@ class Locator
 
     const QPixmap&  getPixmap() {return pixmap;}
     const QPointF&  getCenter() {return center;}
+
     void     setLinePos0(double lp) { loc_wgt.setLinePos0(lp); }
-    double   getLinePos0() { return loc_wgt.getLinePos0(); }
+    unsigned getLinePos0() { return loc_wgt.getLinePos0(); }
     void     setAngle0(unsigned a) { loc_wgt.setAngle0(a); }
-    double   getAngle0() { return loc_wgt.getAngle0(); }
+    unsigned getAngle0() { return loc_wgt.getAngle0(); }
+    void     setSpeed(double s) { loc_wgt.setSpeed(s); }
+    double   getSpeed() { return loc_wgt.getSpeed(); }
     void     setOpacity(double op) { loc_wgt.setOpacity((int)(op*100)); }
     double   getOpacity() { return (double)loc_wgt.getOpacity() / 100.0; }
     void     setRoundsNum(unsigned r) { loc_wgt.setRoundsNum(r); }
@@ -52,7 +55,8 @@ class Locator
     void     setMinAmpl(unsigned a) { min_ampl = a; }
     void     setColorInvert(bool i) { is_color_invert = i; }
 
-    double   getNextPhi();
+    void     start();
+    double   getPhi();
 
     LocWidget& getLocatorWidget()  {return loc_wgt;}
 
@@ -74,6 +78,8 @@ class Locator
              last_discr,  // Конец вывода (дискр. дальн.)
              min_ampl;    // Минимальная отображаемая амплитуда
     bool is_color_invert;
+
+    chrono::time_point<chrono::system_clock> startTime;
 };
 typedef std::list<Locator> Locators;
 

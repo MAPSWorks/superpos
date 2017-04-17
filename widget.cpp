@@ -136,7 +136,6 @@ void Widget::optimizeView()
 
 void Widget::startImit()
 {
-  cout << __PRETTY_FUNCTION__ << endl;
   timer.start(DELTA_T * 1000);
   for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
     it->start();
@@ -144,6 +143,7 @@ void Widget::startImit()
   unsigned idx = 1;
   for (Locators::iterator it = locators.begin(); it != locators.end(); ++it, ++idx) {
     QString name = "RLS_" + QString::number(idx) + "_Data.b";
+    it->start();
     it->setOutFile(name.toStdString().c_str());
   }
 }

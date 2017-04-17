@@ -139,12 +139,8 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
 {
   for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
     const QPointF cnt = it->getCenter();
-    const double phi = it->getNextPhi();
+    const double phi = it->getPhi();
 
-    //cout << "phi = " << phi << endl;
-
-    QTransform tr;
-    //tr.rotate(phi).scale(1.48, 1.48);
     updatePixmapAzim(2000 / pow(2,mapadapter->currentZoom()), phi);
 
     Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
@@ -155,16 +151,13 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
     double lat, lon;
     line.Position(1000, lat,lon);
 
-    cout << lat << " " << lon << endl;
-
     Point *targ = new Point(lat, lon, QPixmap("./pub.png"));
     targlayer->addGeometry(targ);
 
 
     Point *azim = new Point(cnt.x(), cnt.y(),
-                      pixmap_azim.transformed(tr),
+                      pixmap_azim,
                       "azim");
-    //azim->setBaselevel(DEFAULT_ZOOM_LEVEL);
 
     targlayer->addGeometry(azim);
   }

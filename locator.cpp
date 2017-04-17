@@ -64,9 +64,9 @@ void Locator::writeToFile(Targets& targets)
 
   geod.Inverse(lat0, lon0, lat, lon, dist, azim1, azim2, red_l);
 
-  cout << "Distance = "   << line.Distance() << " " << dist << endl;
-  cout << ", Azimuth = "  << line.Azimuth() << " " << azim1 << " " << azim2 << endl;
-  cout << ", Red length = "  << red_l << endl;
+  cout << "Distance = "   << line.Distance() << " " << dist
+       << ", Azimuth = "  << line.Azimuth() << " " << azim1 << " " << azim2
+       << ", Red length = "  << red_l << endl;
 
   //targ.setY(-targ.ry());
  //unsigned dist_discr = sqrt(targ.rx() * targ.rx() + targ.ry() * targ.ry()) * 72223.822090 / METERS_IN_DISCR;
@@ -81,13 +81,6 @@ void Locator::writeToFile(Targets& targets)
 
   cout << "dist_discr = "   << dist_discr
        << ", targ_phi = "  << targ_phi << endl;
-
-#if 0
-  cout << "line angle = " << it_data->data.line_pos.pos * POS_TO_GRAD
-       << ", discr = " << dist_discr
-       << ", targ_phi = " << targ_phi
-       << ", phi = " << phi << endl;
-#endif
 
   while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - phi) > 1000.0 / dist_discr)
   {
@@ -156,10 +149,19 @@ void Locator::updatePixmap()
   painter.end();
 }
 
-double Locator::getNextPhi()
+void Locator::start()
 {
-  phi += 360 * DELTA_T / TIME_ONE_ROUND;
-  if ((getAngle0() + phi) >= 360)
-    phi -= 360;
-  return getAngle0() + phi;
+  startTime = chrono::system_clock::now();
+}
+
+
+double Locator::getPhi()
+{
+  chrono::time_point<chrono::system_clock> cur = std::chrono::system_clock::now();
+
+  double elaps_ns = chrono::duration_cast<std::chrono::nanoseconds>
+                           (cur-startTime).count();
+
+  double t = elaps_ns * 1e-9;
+  return getAngle0() + 360.0 * getSpeed() * t;
 }

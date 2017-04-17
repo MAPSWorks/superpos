@@ -19,6 +19,9 @@ class LocWidget : public QWidget
     void     setAngle0(int a)    { sb_angle0.setValue(a); }
     int      getAngle0()         { return sb_angle0.value(); }
 
+    void     setSpeed(double s)    { dsb_speed.setValue(s); }
+    double   getSpeed()         { return dsb_speed.value(); }
+
     void     setLinePos0(int a)    { sb_linepos0.setValue(a); }
     int      getLinePos0()         { return sb_linepos0.value(); }
 
@@ -33,6 +36,7 @@ class LocWidget : public QWidget
 
     void     setFilename(const char*);
     void     setCoords(QPointF&);
+    void     setStartTime(QPointF&);
 
   signals:
 
@@ -41,12 +45,13 @@ class LocWidget : public QWidget
   private:
     QGridLayout *mainLayout;
 
-    QPushButton pb_update;
-    QSpinBox    sb_rounds_num;
-    QSpinBox    sb_angle0;
-    QSpinBox    sb_linepos0;
-    QSlider     sl_opacity;
-    QCheckBox   cb_do_write;
+    QPushButton    pb_update;
+    QSpinBox       sb_rounds_num;
+    QSpinBox       sb_angle0;
+    QSpinBox       sb_linepos0;
+    QDoubleSpinBox dsb_speed;
+    QSlider        sl_opacity;
+    QCheckBox      cb_do_write;
 };
 
 #endif // LOC_WIDGET_H
