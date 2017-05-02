@@ -32,6 +32,7 @@ Mapviewer::Mapviewer(QWidget *parent):
   mc->setAutoFillBackground(true);
 
   mapadapter = new GoogleMapAdapter(GoogleMapAdapter::satellite);
+//  mapadapter = new GoogleMapAdapter();
   mainlayer = new MapLayer("GoogleMapLayer", mapadapter);
   mc->addLayer(mainlayer);
 
@@ -85,41 +86,10 @@ void Mapviewer::updateTargets(Targets* targets)
 
   targlayer->clearGeometries();
 
-  // QTransform tr;
-  Point *targ;
-
   QPointF crd = targets->front().getCoords();
+  Point *targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
 
- // targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
-
- // targlayer->addGeometry(targ);
-
-
-
-  /*
-    Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
-
-    QPointF c0 = locators->front().getCenter();
-
-    const GeodesicLine line = geod.Line(c0.x(), c0.y(), 0);
-    double lat, lon;
-    line.Position(1000, lat, lon);
-
-    cout << "Position: " << lat << " " << lon << "\n";
-
-    cout << "coordinateToDisplay: "
-         << mapadapter->coordinateToDisplay(QPointF(lat, lon)).x() -
-            mapadapter->coordinateToDisplay(c0).x() << endl;
-  */
-
-/*
-  if (targets->front().getTimeElapsed() < 20.0) {
-    locators.writeToFile(targets);
-  }
-  else {
-    locators[0].closeFile();
-  }
-*/
+  //targlayer->addGeometry(targ);
 }
 
 void Mapviewer::updatePixmapAzim(int L, int phi)
@@ -143,24 +113,57 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
 
     updatePixmapAzim(2000 / pow(2,mapadapter->currentZoom()), phi);
 
-    Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
-
-    //cout << "angle = " << (it_data->data.line_pos.pos * POS_TO_GRAD + getAngle0()) << endl;
-
-    const GeodesicLine line = geod.DirectLine(cnt.x(), cnt.y(), 360.0-phi, 500);
-    double lat, lon;
-    line.Position(1000, lat,lon);
-
-    Point *targ = new Point(lat, lon, QPixmap("./pub.png"));
-    targlayer->addGeometry(targ);
-
-
     Point *azim = new Point(cnt.x(), cnt.y(),
                       pixmap_azim,
                       "azim");
 
     targlayer->addGeometry(azim);
   }
+
+  Geocentric earth(Constants::WGS84_a(), Constants::WGS84_f());
+
+  QPointF cnt(COORDS(34.0, 59.0, 23.0), COORDS(56.0,  8.0, 41.0));
+
+  QPointF loc = locators->front().getCenter();
+  double phi = locators->front().getPhi();
+
+  double lat0 = loc.x(),
+         lon0 = loc.y();
+  LocalCartesian proj(lat0, lon0, 0);
+
+  double x, y, z, lat, lon, h;
+  double L = 1000;
+
+  x = -L * sin(phi * GRAD_TO_RAD);
+  y = L * cos(phi * GRAD_TO_RAD);
+ // x = 216;
+ // y = -51;
+  z = 0;
+  proj.Reverse(x,y,z,lat,lon,h);
+
+  double R = sqrt(x*x + y*y);
+
+  double targ_phi = 180.0 / 3.14 * atan(- y / x);
+  if (x < 0) targ_phi += 180.0;
+
+  cout << "Phi: " << phi << " " << targ_phi << endl;
+  cout << "Local: " << x << " " << y << " " << z << " " << R << endl;
+  cout << "Geo:   " << lat << " " << lon << " " << h << endl;
+
+  // proj.Forward(x,y,z,lat,lon,h);
+
+  QPixmap pxm(10,10);
+  pxm.fill(Qt::red);
+  Point *targ = new Point(lat, lon, pxm);
+
+  targlayer->addGeometry(targ);
+/*
+  QPixmap pxm2(10,10);
+  pxm.fill(Qt::green);
+  Point *targ2 = new Point(COORDS(34.0, 59.0, 20.045), COORDS(56.0,  8.0, 47.994), pxm2);
+
+  targlayer->addGeometry(targ2);
+*/
 }
 
 void Mapviewer::resetView(Locators *locators)

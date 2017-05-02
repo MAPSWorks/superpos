@@ -25,9 +25,8 @@ Widget::Widget():
 */
  // targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
   targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
-                          /* 0.03 * QPointF((COORDS(34.0, 58.0, 56.451) - COORDS(34.0, 59.0, 39.304)),
-                                          COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764)))); */
-                           QPointF(0.0, 0.0)));
+                           0.03 * QPointF((COORDS(34.0, 58.0, 56.451) - COORDS(34.0, 59.0, 39.304)),
+                                          COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764))));
 
   mv = new Mapviewer(this);
   mv->setGeometry(10,10,650,650);
