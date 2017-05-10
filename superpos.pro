@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     target.cpp \
     mapviewer.cpp \
     dialog.cpp \
-    loc_widget.cpp
+    loc_widget.cpp \
+    motion.cpp
 
 HEADERS  += widget.h \
     parser.h \
@@ -32,7 +33,8 @@ HEADERS  += widget.h \
     target.h \
     mapviewer.h \
     dialog.h \
-    loc_widget.h
+    loc_widget.h \
+    motion.h
 
 FORMS    += widget.ui
 

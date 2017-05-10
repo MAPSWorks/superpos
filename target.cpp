@@ -2,12 +2,13 @@
 
 #include <iostream>
 
-Target::Target(QPointF c0, QPointF v):
-  coord0(c0), vel(v)
+Target::Target(BaseMotionModel *m):
+  motion(m)
 {
-  time.start();
+
 }
 
+/*
 void Target::start()
 {
   startTime = chrono::system_clock::now();
@@ -25,3 +26,4 @@ QPointF Target::getCoords()
   double t = elaps_ns * 1e-9;
   return coord0 + vel * t;
 }
+*/

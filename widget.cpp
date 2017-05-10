@@ -24,9 +24,9 @@ Widget::Widget():
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_4_fileRLS_FFT_001.b", 1115); // 98 град
 */
  // targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
-  targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
+  targets.push_back(Target(new LinearMotionModel(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
                            0.03 * QPointF((COORDS(34.0, 58.0, 56.451) - COORDS(34.0, 59.0, 39.304)),
-                                          COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764))));
+                                          COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764)))));
 
   mv = new Mapviewer(this);
   mv->setGeometry(10,10,650,650);

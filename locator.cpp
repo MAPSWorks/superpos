@@ -35,7 +35,7 @@ void Locator::init(QPointF cnt, const char * filename, int lp0)
   // Загрузка данных из файла записи
   parser.openFile(filename);
   data.reserve(DATA_NUM_ONE_ROUND);
-  DATA_PACKAGE_AD d = parser.getData();
+  //DATA_PACKAGE_AD d = parser.getData();
   data.push_back(parser.getData());
   for (unsigned n = 1; n < DATA_NUM_ONE_ROUND * getRoundsNum(); ++n)
     data.push_back(parser.getData());

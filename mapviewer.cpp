@@ -89,7 +89,7 @@ void Mapviewer::updateTargets(Targets* targets)
   QPointF crd = targets->front().getCoords();
   Point *targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
 
-  //targlayer->addGeometry(targ);
+  targlayer->addGeometry(targ);
 }
 
 void Mapviewer::updatePixmapAzim(int L, int phi)

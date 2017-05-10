@@ -4,26 +4,24 @@
 #include <QPointF>
 #include <QTime>
 
-#include <chrono>
+#include "motion.h"
 
 using namespace std;
+
 
 class Target
 {
   public:
-    Target(QPointF, QPointF);
+    Target(BaseMotionModel*);
     ~Target() {}
 
-    void start();
-    QPointF getCoords();
-    double getTimeElapsed() {return 0.001*time.elapsed();}
+    void start() { motion -> start(); }
+    QPointF getCoords() {return motion -> getCoords();}
 
   private:
-    QTime time;
-    QPointF coord0,
-            vel;
+    BaseMotionModel *motion;
 
-    chrono::time_point<chrono::system_clock> startTime;
+
 };
 typedef std::vector<Target> Targets;
 
