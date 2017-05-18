@@ -146,9 +146,11 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
   double targ_phi = 180.0 / 3.14 * atan(- y / x);
   if (x < 0) targ_phi += 180.0;
 
+/*
   cout << "Phi: " << phi << " " << targ_phi << endl;
   cout << "Local: " << x << " " << y << " " << z << " " << R << endl;
   cout << "Geo:   " << lat << " " << lon << " " << h << endl;
+*/
 
   // proj.Forward(x,y,z,lat,lon,h);
 

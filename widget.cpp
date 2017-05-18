@@ -19,14 +19,22 @@ Widget::Widget():
   locators.back().init(QPointF(COORDS(34.0, 59.0, 44.07), COORDS(56.0,  8.0, 49.83)),
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 501); // 44 град
 
-/*  locators.push_back(Locator());
+/*
+  locators.push_back(Locator());
   locators.back().init(QPointF(COORDS(34.0, 58.0, 50.20), COORDS(56.0,  8.0, 29.59)),
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_4_fileRLS_FFT_001.b", 1115); // 98 град
 */
- // targets.push_back(Target(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
+
+/*
   targets.push_back(Target(new LinearMotionModel(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)),
                            0.03 * QPointF((COORDS(34.0, 58.0, 56.451) - COORDS(34.0, 59.0, 39.304)),
                                           COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764)))));
+*/
+
+  PointsVector pv;
+  pv.push_back(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)));
+  pv.push_back(QPointF(COORDS(34.0, 58.0, 56.451), COORDS(56.0,  8.0, 32.691)));
+  targets.push_back(Target(new PoligonalMotionModel(pv, 0.03)));
 
   mv = new Mapviewer(this);
   mv->setGeometry(10,10,650,650);

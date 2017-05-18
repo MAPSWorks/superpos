@@ -3,6 +3,7 @@
 
 #include <QPointF>
 
+#include <vector>
 #include <chrono>
 
 using namespace std;
@@ -33,5 +34,18 @@ class LinearMotionModel: public BaseMotionModel
             vel;
 };
 
+typedef std::vector<QPointF> PointsVector;
+
+class PoligonalMotionModel: public BaseMotionModel
+{
+  public:
+    PoligonalMotionModel(PointsVector, double);
+
+    QPointF getCoords();
+
+  private:
+    PointsVector points;
+    double       vel;
+};
 
 #endif // MOTION_H
