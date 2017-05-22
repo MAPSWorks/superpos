@@ -6,6 +6,9 @@
 #include <vector>
 #include <chrono>
 
+//#include "../alglib/interpolation.h"
+
+//using namespace alglib;
 using namespace std;
 
 class BaseMotionModel
@@ -36,6 +39,7 @@ class LinearMotionModel: public BaseMotionModel
 
 typedef std::vector<QPointF> PointsVector;
 
+// Модель движения по ломаной
 class PoligonalMotionModel: public BaseMotionModel
 {
   public:
@@ -46,6 +50,25 @@ class PoligonalMotionModel: public BaseMotionModel
   private:
     PointsVector points;
     double       vel;
+    QPointF      coords; // Текущие координаты
 };
+
+/*
+// Модель движения по кривой, задаваемой набором точек
+class SplineMotionModel: public BaseMotionModel
+{
+  public:
+    SplineMotionModel(PointsVector, double);
+
+    QPointF getCoords();
+
+  private:
+    PointsVector points;
+    double       vel;
+
+    spline1dinterpolant sx, sy;
+
+};
+*/
 
 #endif // MOTION_H

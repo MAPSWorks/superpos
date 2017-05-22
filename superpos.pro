@@ -39,3 +39,16 @@ HEADERS  += widget.h \
 FORMS    += widget.ui
 
 DISTFILES +=
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../alglib/release/ -lalglib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../alglib/debug/ -lalglib
+else:unix: LIBS += -L$$PWD/../alglib/ -lalglib
+
+INCLUDEPATH += $$PWD/../alglib/src
+DEPENDPATH += $$PWD/../alglib/src
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../alglib/release/libalglib.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../alglib/debug/libalglib.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../alglib/release/alglib.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../alglib/debug/alglib.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../alglib/libalglib.a

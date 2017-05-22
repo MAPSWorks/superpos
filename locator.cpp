@@ -142,9 +142,10 @@ void Locator::updatePixmap()
     for (unsigned i = first_discr; i < last_discr; i++) {
       float x = it->data.out_data.spectr[i];
 
+/*
       if (i == 1000)
         x = 100000;
-
+*/
       QColor color;
 
       if (x < min_ampl)

@@ -36,6 +36,8 @@ class Widget : public QWidget
     void updateTabWidget();
     void optimizeView();
 
+    void addTargetPoint(const QMouseEvent*, QPointF);
+
     void startImit();
     void stopImit();
 
@@ -51,6 +53,9 @@ class Widget : public QWidget
     QCheckBox *cb_invert_color;
 
     QTimer timer;
+
+    // Временно
+    PointsVector points_vector;
 
     Locators locators;
     Targets targets;

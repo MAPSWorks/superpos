@@ -37,6 +37,9 @@ public:
 
     int getZoomLevel() { return mapadapter->adaptedZoom(); }
 
+signals:
+    void mouseEventCoordinate (const QMouseEvent* e, const QPointF p);
+
 private:
     MapControl* mc;
     MapAdapter* mapadapter;
@@ -52,6 +55,8 @@ private:
 
 protected slots:
     void updateViewLabels(const QPointF&, int);
+    void onMouseEventCoordinate(const QMouseEvent* e, const QPointF p)
+      { emit mouseEventCoordinate(e, p); }
 
 protected:
     virtual void resizeEvent(QResizeEvent * event);

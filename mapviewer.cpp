@@ -49,6 +49,9 @@ Mapviewer::Mapviewer(QWidget *parent):
   mc->addLayer(targlayer);
 
   mc->showScale(true);
+
+  connect(mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
+          this, SLOT(onMouseEventCoordinate(const QMouseEvent*,QPointF)));
 }
 
 Mapviewer::~Mapviewer()
@@ -141,7 +144,7 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
   z = 0;
   proj.Reverse(x,y,z,lat,lon,h);
 
-  double R = sqrt(x*x + y*y);
+  //double R = sqrt(x*x + y*y);
 
   double targ_phi = 180.0 / 3.14 * atan(- y / x);
   if (x < 0) targ_phi += 180.0;
@@ -151,8 +154,23 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
   cout << "Local: " << x << " " << y << " " << z << " " << R << endl;
   cout << "Geo:   " << lat << " " << lon << " " << h << endl;
 */
-
   // proj.Forward(x,y,z,lat,lon,h);
+
+
+/*
+  proj.Forward(x,y,z,lat,lon,h);
+  cout << lat << " " << lon << endl;
+
+  proj.Forward(x,y,z,lat,lon,h);
+  cout << lat << " " << lon << endl;
+
+  proj.Forward(x,y,z,lat,lon,h);
+  cout << lat << " " << lon << endl;
+
+  proj.Forward(x,y,z,lat,lon,h);
+  cout << lat << " " << lon << endl;
+*/
+
 
   QPixmap pxm(10,10);
   pxm.fill(Qt::red);
@@ -215,6 +233,8 @@ void Mapviewer::updateViewLabels(const QPointF &, int)
   zoomlabel->setText("Zoom level " +
                       QString::number(mapadapter->adaptedZoom()));
 }
+
+
 
 void Mapviewer::resizeEvent ( QResizeEvent * event )	
 {

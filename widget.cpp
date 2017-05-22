@@ -31,10 +31,11 @@ Widget::Widget():
                                           COORDS(56.0,  8.0, 32.691) - COORDS(56.0,  8.0, 42.764)))));
 */
 
-  PointsVector pv;
-  pv.push_back(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)));
-  pv.push_back(QPointF(COORDS(34.0, 58.0, 56.451), COORDS(56.0,  8.0, 32.691)));
-  targets.push_back(Target(new PoligonalMotionModel(pv, 0.03)));
+
+//  points_vector.push_back(QPointF(COORDS(34.0, 59.0, 39.304), COORDS(56.0,  8.0, 42.764)));
+//  points_vector.push_back(QPointF(COORDS(34.0, 58.0, 56.451), COORDS(56.0,  8.0, 32.691)));
+//  points_vector.push_back(QPointF(COORDS(34.0, 58.0, 10.451), COORDS(56.0,  8.0, 32.691)));
+//  targets.push_back(Target(new PoligonalMotionModel(pv, 0.002)));
 
   mv = new Mapviewer(this);
   mv->setGeometry(10,10,650,650);
@@ -48,6 +49,8 @@ Widget::Widget():
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
   connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
+  connect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
+          this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
   updateTabWidget();
@@ -116,7 +119,7 @@ void Widget::updateLocators()
 void Widget::updateTargets()
 {
   mv->updateTargets(&targets);
-  mv->updateLocAzimuths(&locators);
+  //mv->updateLocAzimuths(&locators);
 
   for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
     it->writeToFile(targets);
@@ -143,6 +146,9 @@ void Widget::optimizeView()
 
 void Widget::startImit()
 {
+  if (!points_vector.empty())
+    targets.push_back(Target(new PoligonalMotionModel(points_vector, 0.002)));
+
   timer.start(DELTA_T * 1000);
   for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
     it->start();
@@ -161,6 +167,7 @@ void Widget::stopImit()
   for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
     it->closeFile();
   }
+  points_vector.clear();
   timer.stop();
 }
 
@@ -190,4 +197,12 @@ void Widget::updateGroupBox()
   vbox->addWidget(cb_invert_color, 3,0);
   vbox->addWidget(new QLabel("Инвертировать цвет"), 3,1);
   ui->groupBox->setLayout(vbox);
+}
+
+void Widget::addTargetPoint(const QMouseEvent* e, QPointF p)
+{
+  if (e->type() == QEvent::MouseButtonPress) {
+    cout << "Point " << p.x() << " " << p.y() << endl;
+    points_vector.push_back(p);
+  }
 }
