@@ -35,67 +35,45 @@ void Locator::init(QPointF cnt, const char * filename, int lp0)
   // Загрузка данных из файла записи
   parser.openFile(filename);
   data.reserve(DATA_NUM_ONE_ROUND);
-  //DATA_PACKAGE_AD d = parser.getData();
-  data.push_back(parser.getData());
+
+  DATA_PACKAGE_AD d = parser.getData();
+  data.push_back(d);
+
   for (unsigned n = 1; n < DATA_NUM_ONE_ROUND * getRoundsNum(); ++n)
     data.push_back(parser.getData());
+
   it_data = data.begin();
 }
 
 void Locator::writeToFile(Targets& targets)
-{
-  //QPointF targ = targets.front().getCoords() - getCenter();
-
-/* С геодезическими координатами
-  Geodesic geod(Constants::WGS84_a(), Constants::WGS84_f());
-
-  double lat = targets.front().getCoords().x(),
-         lon = targets.front().getCoords().y();
-  double lat0 = getCenter().x(),
-         lon0 = getCenter().y();
-
-  cout << "Locator: " << lat0 << ", " << lon0 << endl;
-  cout << "Target: "  << lat  << ", " << lon  << endl;
-
-  const GeodesicLine line = geod.InverseLine(lat0, lon0, lat, lon);
-
-  double dist, azim1, azim2, red_l;
-
-  geod.Inverse(lat0, lon0, lat, lon, dist, azim1, azim2, red_l);
-
-  cout << "Distance = "   << line.Distance() << " " << dist
-       << ", Azimuth = "  << line.Azimuth() << " " << azim1 << " " << azim2
-       << ", Red length = "  << red_l << endl;
-
-*/
-
+{ 
   Geocentric earth(Constants::WGS84_a(), Constants::WGS84_f());
 
-  double lat0 = getCenter().x(),
-         lon0 = getCenter().y();
-  LocalCartesian proj(lat0, lon0, 0, earth);
+  double lat0 = getCenter().y(),
+         lon0 = getCenter().x(),
+         h0   = 0;
 
-  double lat = targets.front().getCoords().x(),
-         lon = targets.front().getCoords().y(),
-         h = 0;
+  LocalCartesian proj(lat0, lon0, h0, earth);
 
+  double lat = targets.front().getCoords().y(),
+         lon = targets.front().getCoords().x(),
+         h   = 0;
   double x, y, z;
-  proj.Forward(lat, lon, h, y, x, z);
-  // cout << x << " " << y << " " << z << "\n";
+
+  proj.Forward(lat, lon, h, x, y, z);
+
+#if 0
+  cout << lat0 << " " << lon0 << endl;
+  cout << lat  << " " << lon  << endl;
+  cout << x << " " << y << " " << z << "\n";
+#endif
 
   unsigned dist_discr = sqrt(x*x + y*y) / METERS_IN_DISCR;
-
   double targ_phi = 180.0 / 3.14 * atan(-y / x);
   if (x < 0) targ_phi += 180.0;
 
-  // cout << "Dist Discr = " << dist_discr << ", Azim = " << targ_phi << "\n";
-
   while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - getPhi()) > 3)
   {
-/*
-    cout << "Loc Az = " << it_data->data.line_pos.pos * POS_TO_GRAD
-         << ", Phi = " << getPhi() << endl;
-*/
     DATA_PACKAGE_AD d = *it_data;
 
     if ((fabs((it_data->data.line_pos.pos + getLinePos0()) * POS_TO_GRAD - targ_phi) < 1000.0 / dist_discr)
@@ -103,8 +81,7 @@ void Locator::writeToFile(Targets& targets)
     {
 
       for (int i = -10; i < 11; ++i)
-        d.data.out_data.spectr[dist_discr + i] = 1000000;
-
+        d.data.out_data.spectr[dist_discr + i] = 100000;
     }
     out_file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
 

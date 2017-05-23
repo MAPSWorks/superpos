@@ -122,68 +122,6 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
 
     targlayer->addGeometry(azim);
   }
-
-  Geocentric earth(Constants::WGS84_a(), Constants::WGS84_f());
-
-  QPointF cnt(COORDS(34.0, 59.0, 23.0), COORDS(56.0,  8.0, 41.0));
-
-  QPointF loc = locators->front().getCenter();
-  double phi = locators->front().getPhi();
-
-  double lat0 = loc.x(),
-         lon0 = loc.y();
-  LocalCartesian proj(lat0, lon0, 0);
-
-  double x, y, z, lat, lon, h;
-  double L = 1000;
-
-  x = -L * sin(phi * GRAD_TO_RAD);
-  y = L * cos(phi * GRAD_TO_RAD);
- // x = 216;
- // y = -51;
-  z = 0;
-  proj.Reverse(x,y,z,lat,lon,h);
-
-  //double R = sqrt(x*x + y*y);
-
-  double targ_phi = 180.0 / 3.14 * atan(- y / x);
-  if (x < 0) targ_phi += 180.0;
-
-/*
-  cout << "Phi: " << phi << " " << targ_phi << endl;
-  cout << "Local: " << x << " " << y << " " << z << " " << R << endl;
-  cout << "Geo:   " << lat << " " << lon << " " << h << endl;
-*/
-  // proj.Forward(x,y,z,lat,lon,h);
-
-
-/*
-  proj.Forward(x,y,z,lat,lon,h);
-  cout << lat << " " << lon << endl;
-
-  proj.Forward(x,y,z,lat,lon,h);
-  cout << lat << " " << lon << endl;
-
-  proj.Forward(x,y,z,lat,lon,h);
-  cout << lat << " " << lon << endl;
-
-  proj.Forward(x,y,z,lat,lon,h);
-  cout << lat << " " << lon << endl;
-*/
-
-
-  QPixmap pxm(10,10);
-  pxm.fill(Qt::red);
-  Point *targ = new Point(lat, lon, pxm);
-
-  targlayer->addGeometry(targ);
-/*
-  QPixmap pxm2(10,10);
-  pxm.fill(Qt::green);
-  Point *targ2 = new Point(COORDS(34.0, 59.0, 20.045), COORDS(56.0,  8.0, 47.994), pxm2);
-
-  targlayer->addGeometry(targ2);
-*/
 }
 
 void Mapviewer::resetView(Locators *locators)

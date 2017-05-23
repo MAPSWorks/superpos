@@ -119,7 +119,7 @@ void Widget::updateLocators()
 void Widget::updateTargets()
 {
   mv->updateTargets(&targets);
-  //mv->updateLocAzimuths(&locators);
+  mv->updateLocAzimuths(&locators);
 
   for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
     it->writeToFile(targets);
@@ -147,7 +147,7 @@ void Widget::optimizeView()
 void Widget::startImit()
 {
   if (!points_vector.empty())
-    targets.push_back(Target(new PoligonalMotionModel(points_vector, 0.002)));
+    targets.push_back(Target(new PoligonalMotionModel(points_vector, 0.001)));
 
   timer.start(DELTA_T * 1000);
   for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
