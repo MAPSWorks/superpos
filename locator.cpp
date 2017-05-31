@@ -9,6 +9,11 @@
 using namespace std;
 using namespace GeographicLib;
 
+struct LocCoordPoint {
+  unsigned discr;
+  double   phi;
+};
+
 Locator::Locator()
 {
 }
@@ -47,48 +52,64 @@ void Locator::init(QPointF cnt, const char * filename, int lp0)
 
 void Locator::writeToFile(Targets& targets)
 { 
+  std::vector<LocCoordPoint> cps;
   Geocentric earth(Constants::WGS84_a(), Constants::WGS84_f());
-
   double lat0 = getCenter().y(),
          lon0 = getCenter().x(),
          h0   = 0;
-
+  double x, y, z;
   LocalCartesian proj(lat0, lon0, h0, earth);
 
-  double lat = targets.front().getCoords().y(),
-         lon = targets.front().getCoords().x(),
-         h   = 0;
-  double x, y, z;
+  cout << "Targets num = " << targets.size() << endl;
 
-  proj.Forward(lat, lon, h, x, y, z);
+  for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
+    double lat = it->getCoords().y(),
+           lon = it->getCoords().x(),
+           h   = 0;
 
-#if 0
-  cout << lat0 << " " << lon0 << endl;
-  cout << lat  << " " << lon  << endl;
-  cout << x << " " << y << " " << z << "\n";
-#endif
+    proj.Forward(lat, lon, h, x, y, z);
 
-  unsigned dist_discr = sqrt(x*x + y*y) / METERS_IN_DISCR;
-  double targ_phi = 180.0 / 3.14 * atan(-y / x);
-  if (x < 0) targ_phi += 180.0;
+    LocCoordPoint p;
+    p.discr = sqrt(x*x + y*y) / METERS_IN_DISCR;
+    p.phi = 180.0 / 3.14 * atan(-y / x);
 
-  while(fabs(it_data->data.line_pos.pos * POS_TO_GRAD - getPhi()) > 3)
-  {
+    cout << "x, y: " << x << " " << y << endl;
+
+    if (x < 0) p.phi += 180.0;
+    if ((x > 0) && (y > 0)) p.phi += 360.0;
+
+    cps.push_back(p);
+  }
+
+  cout << "CPs num = " << cps.size() << endl;
+
+
+  double current_line_pos;
+
+  do {
+    current_line_pos = ((it_data->data.line_pos.pos + getLinePos0()) % MAX_LINE_POS);
+
     DATA_PACKAGE_AD d = *it_data;
 
-    if ((fabs((it_data->data.line_pos.pos + getLinePos0()) * POS_TO_GRAD - targ_phi) < 1000.0 / dist_discr)
-        && (dist_discr < DISCR_NUM) && (dist_discr > 10.0))
-    {
+    for (std::vector<LocCoordPoint>::iterator it = cps.begin(); it != cps.end(); ++it) {
 
-      for (int i = -10; i < 11; ++i)
-        d.data.out_data.spectr[dist_discr + i] = 100000;
+      cout << "CP: " << it->discr << " " << it->phi << endl;
+
+      if ((fabs(current_line_pos * POS_TO_GRAD - it->phi) < 1000.0 / it->discr)
+          && (it->discr < DISCR_NUM) && (it->discr > 10.0))
+      {
+        for (int i = -10; i < 11; ++i)
+          d.data.out_data.spectr[it->discr + i] += 100000;
+      }
     }
+
     out_file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
 
     it_data++;
     if (it_data == data.end())
       it_data = data.begin();
   }
+  while(fabs(current_line_pos * POS_TO_GRAD - getPhi()) > 3);
 }
 
 void Locator::setOutFile(const char* name)

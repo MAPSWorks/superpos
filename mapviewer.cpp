@@ -89,10 +89,13 @@ void Mapviewer::updateTargets(Targets* targets)
 
   targlayer->clearGeometries();
 
-  QPointF crd = targets->front().getCoords();
-  Point *targ = new Point(crd.x(), crd.y(), QPixmap("./pub.png"));
-
-  targlayer->addGeometry(targ);
+  for (Targets::iterator it = targets->begin(); it != targets->end(); ++it) {
+    QPointF crd = it -> getCoords();
+    QPixmap pxm(10,10);
+    pxm.fill(Qt::red);
+    Point *targ = new Point(crd.x(), crd.y(), pxm);
+    targlayer->addGeometry(targ);
+  }
 }
 
 void Mapviewer::updatePixmapAzim(int L, int phi)

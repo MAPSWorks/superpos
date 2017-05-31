@@ -41,6 +41,10 @@ class Widget : public QWidget
     void startImit();
     void stopImit();
 
+    void beginAddTarget();
+    void endAddTarget();
+    void deleteTargets();
+
   private:
     void updateGroupBox();
 

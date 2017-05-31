@@ -47,10 +47,13 @@ Widget::Widget():
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateTabWidget()));
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
+
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
   connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
-  connect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
-          this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
+  connect(ui->pbBeginAddTarg, SIGNAL(released()), SLOT(beginAddTarget()));
+  connect(ui->pbEndAddTarg,   SIGNAL(released()), SLOT(endAddTarget()));
+  connect(ui->pbDeleteTargs,  SIGNAL(released()), SLOT(deleteTargets()));
+
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
   updateTabWidget();
@@ -146,8 +149,10 @@ void Widget::optimizeView()
 
 void Widget::startImit()
 {
-  if (!points_vector.empty())
-    targets.push_back(Target(new PoligonalMotionModel(points_vector, 0.001)));
+  if (targets.empty()) {
+    QMessageBox::information(0, "Запуск имитации", "Нет целей для имитации.");
+    return;
+  }
 
   timer.start(DELTA_T * 1000);
   for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
@@ -163,12 +168,34 @@ void Widget::startImit()
 
 void Widget::stopImit()
 {
-  cout << __PRETTY_FUNCTION__ << endl;
   for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
     it->closeFile();
   }
-  points_vector.clear();
   timer.stop();
+}
+
+void Widget::beginAddTarget()
+{
+  connect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
+          this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
+}
+
+void Widget::endAddTarget()
+{
+  disconnect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
+          this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
+  if (!points_vector.empty())
+    targets.push_back(Target(new PoligonalMotionModel(points_vector, 0.001)));
+  points_vector.clear();
+
+  ui->labelTargNum->setText("Количество целей - " + QString::number(targets.size()));
+}
+
+void Widget::deleteTargets()
+{
+  points_vector.clear();
+  targets.clear();
+  ui->labelTargNum->setText("Количество целей - " + QString::number(targets.size()));
 }
 
 void Widget::updateGroupBox()

@@ -48,10 +48,16 @@ QPointF PoligonalMotionModel::getCoords()
   double t_prev = 0;
 
   unsigned i = 0;
+
+  if (points.size() == 1)
+    return points[0];
+
   while (i < points.size() - 1) {
     QPointF d = points[i+1] - points[i];
     double abs_d = sqrt(d.x()*d.x() + d.y()*d.y());
-      cout << "abs_d = " << abs_d << endl;
+
+    // cout << "abs_d = " << abs_d << endl;
+
     t_prev = t;
     t += (abs_d) / vel;
     if (dt < t) {
@@ -61,7 +67,7 @@ QPointF PoligonalMotionModel::getCoords()
     ++i;
   }
 
-  cout << dt << " " << t << " " << coords.x() << " " << coords.y() << endl;
+  // cout << dt << " " << t << " " << coords.x() << " " << coords.y() << endl;
 
   return coords; // coord0 + vel * getTimeDelta();
 }
