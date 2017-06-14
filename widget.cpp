@@ -42,6 +42,12 @@ Widget::Widget():
   mv->setView(locators.front().getCenter());
   mv->updatePixmapAzim(DISCR_NUM*SCALE*METERS_IN_DISCR, 0);
 
+  // Панель общих параметров
+  params = new ParamsGroupBox;
+  params->setParent(this);
+  params->setGeometry(680, 450, 300, 200);
+  params->init();
+
   connect(ui->pbAddLoc, SIGNAL(released()), this, SLOT(addLocator()));
   connect(ui->pbDelLoc, SIGNAL(released()), this, SLOT(deleteLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
@@ -57,7 +63,6 @@ Widget::Widget():
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
   updateTabWidget();
-  updateGroupBox();
   updateLocators();
 }
 
@@ -110,10 +115,10 @@ void Widget::deleteLocators()
 void Widget::updateLocators()
 {
   for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
-    it->setFirstDiscr(sb_first_discr->value());
-    it->setLastDiscr(sb_last_discr->value());
-    it->setMinAmpl(sb_min_ampl->value());
-    it->setColorInvert(cb_invert_color->checkState());
+    it->setFirstDiscr(params->getFirstDiscr());
+    it->setLastDiscr(params->getLastDiscr());
+    it->setMinAmpl(params->getMinAmpl());
+    it->setColorInvert(params->getIsColorInvert());
   }
 
   mv->updateLocators(&locators);
@@ -196,34 +201,6 @@ void Widget::deleteTargets()
   points_vector.clear();
   targets.clear();
   ui->labelTargNum->setText("Количество целей - " + QString::number(targets.size()));
-}
-
-void Widget::updateGroupBox()
-{
-  sb_first_discr = new QSpinBox();
-  sb_first_discr->setMinimum(0);
-  sb_first_discr->setMaximum(1000);
-  sb_first_discr->setValue(100);
-  sb_last_discr = new QSpinBox();
-  sb_last_discr->setMinimum(1001);
-  sb_last_discr->setMaximum(4096);
-  sb_last_discr->setValue(2500);
-  sb_min_ampl = new QSpinBox();
-  sb_min_ampl->setMinimum(0);
-  sb_min_ampl->setMaximum(1000);
-  sb_min_ampl->setValue(5);
-  cb_invert_color = new QCheckBox();
-
-  QGridLayout *vbox = new QGridLayout;
-  vbox->addWidget(sb_first_discr, 0,0);
-  vbox->addWidget(new QLabel("Начальный квант дальности"), 0,1);
-  vbox->addWidget(sb_last_discr, 1,0);
-  vbox->addWidget(new QLabel("Конечный квант дальности"), 1,1);
-  vbox->addWidget(sb_min_ampl, 2,0);
-  vbox->addWidget(new QLabel("Мин. отображаемая амплитуда"), 2,1);
-  vbox->addWidget(cb_invert_color, 3,0);
-  vbox->addWidget(new QLabel("Инвертировать цвет"), 3,1);
-  ui->groupBox->setLayout(vbox);
 }
 
 void Widget::addTargetPoint(const QMouseEvent* e, QPointF p)

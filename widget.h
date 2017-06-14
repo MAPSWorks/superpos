@@ -15,6 +15,7 @@
 
 #include "mapviewer.h"
 #include "locator.h"
+#include "params_groupbox.h"
 
 namespace Ui {
   class Widget;
@@ -46,20 +47,15 @@ class Widget : public QWidget
     void deleteTargets();
 
   private:
-    void updateGroupBox();
-
     Ui::Widget *ui;
     Mapviewer *mv;
-
-    QSpinBox *sb_first_discr;
-    QSpinBox *sb_last_discr;
-    QSpinBox *sb_min_ampl;
-    QCheckBox *cb_invert_color;
 
     QTimer timer;
 
     // Временно
     PointsVector points_vector;
+
+    ParamsGroupBox *params;
 
     Locators locators;
     Targets targets;

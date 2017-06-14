@@ -49,6 +49,7 @@ class Locator
     double   getOpacity() { return (double)loc_wgt.getOpacity() / 100.0; }
     void     setRoundsNum(unsigned r) { loc_wgt.setRoundsNum(r); }
     unsigned getRoundsNum() { return loc_wgt.getRoundsNum(); }
+
     void     setFirstDiscr(unsigned f) { first_discr = f; }
     void     setLastDiscr(unsigned l) { last_discr = l; }
     void     setMinAmpl(unsigned a) { min_ampl = a; }
