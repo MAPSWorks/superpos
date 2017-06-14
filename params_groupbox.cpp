@@ -8,8 +8,11 @@ ParamsGroupBox::ParamsGroupBox()
 
 }
 
-void ParamsGroupBox::init()
+void ParamsGroupBox::init(QWidget* parent, const QRect& geom)
 {
+  setParent(parent);
+  setGeometry(geom);
+
   sb_first_discr = new QSpinBox();
   sb_first_discr->setMinimum(0);
   sb_first_discr->setMaximum(1000);
@@ -34,4 +37,16 @@ void ParamsGroupBox::init()
   vbox->addWidget(cb_invert_color, 3,0);
   vbox->addWidget(new QLabel("Инвертировать цвет"), 3,1);
   setLayout(vbox);
+}
+
+CommonParams ParamsGroupBox::getCommonParams()
+{
+  CommonParams p;
+
+  p.first_discr = sb_first_discr->value();
+  p.last_discr  = sb_last_discr->value();
+  p.min_ampl    = sb_min_ampl->value();
+  p.is_color_invert = cb_invert_color->checkState();
+
+  return p;
 }

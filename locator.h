@@ -60,10 +60,10 @@ class Locator
 
     LocWidget& getLocatorWidget()  {return loc_wgt;}
 
-    LocWidget loc_wgt;
-
   private:
     //Locator& operator=(const Locator&);
+
+    LocWidget loc_wgt;
 
     Parser   parser;
     DataCont data;

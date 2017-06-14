@@ -2,7 +2,6 @@
 #include "ui_widget.h"
 
 #include "locator.h"
-#include "dialog.h"
 
 #include <iostream>
 
@@ -13,11 +12,12 @@ Widget::Widget():
 {
   ui->setupUi(this);
 
-  locators.clear();
+ /* locators.clear();
 
   locators.push_back(Locator());
   locators.back().init(QPointF(COORDS(34.0, 59.0, 44.07), COORDS(56.0,  8.0, 49.83)),
             "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 501); // 44 град
+*/
 
 /*
   locators.push_back(Locator());
@@ -39,20 +39,22 @@ Widget::Widget():
 
   mv = new Mapviewer(this);
   mv->setGeometry(10,10,650,650);
-  mv->setView(locators.front().getCenter());
+  mv->setView(locators_ctrl.getCenter());
   mv->updatePixmapAzim(DISCR_NUM*SCALE*METERS_IN_DISCR, 0);
 
-  // Панель общих параметров
-  params = new ParamsGroupBox;
-  params->setParent(this);
-  params->setGeometry(680, 450, 300, 200);
-  params->init();
+  // Панель локаторов
+  locators_ctrl.initTabWidget(this, QRect(680, 20, 340, 260));
 
-  connect(ui->pbAddLoc, SIGNAL(released()), this, SLOT(addLocator()));
-  connect(ui->pbDelLoc, SIGNAL(released()), this, SLOT(deleteLocators()));
+  // Панель общих параметров
+  params.init(this, QRect(680, 450, 340, 200));
+
+  connect(ui->pbAddLoc, SIGNAL(released()), &locators_ctrl, SLOT(addLocator()));
+  connect(ui->pbDelLoc, SIGNAL(released()), &locators_ctrl, SLOT(deleteLocators()));
+  connect(ui->pbUpdate, SIGNAL(released()), &locators_ctrl, SLOT(updateTabWidget()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
-  connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateTabWidget()));
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
+
+  connect(&locators_ctrl, SIGNAL(eventUpdate()), this, SLOT(updateLocators()));
 
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
   connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
@@ -62,7 +64,6 @@ Widget::Widget():
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
-  updateTabWidget();
   updateLocators();
 }
 
@@ -72,84 +73,27 @@ Widget::~Widget()
   delete ui;
 }
 
-void Widget::addLocator()
-{
-  InputDialog* pInputDialog = new InputDialog;
-  if (pInputDialog->exec() == QDialog::Accepted) {
-    bool ok1, ok2;
-    double lat = pInputDialog->latitude().toDouble(&ok1);
-    double lon = pInputDialog->longitude().toDouble(&ok2);
-    QString fname = pInputDialog->filename();
-
-    if (!ok1 || !ok2) {
-      QMessageBox::information(0, "Добавление РЛС", "Неверный формат координат.");
-      return;
-    }
-
-    locators.push_back(Locator());
-    locators.back().init(QPointF(lat, lon), fname.toStdString().c_str(), 0);
-
-    updateLocators();
-    updateTabWidget();
-    QMessageBox::information(0, "Добавление РЛС", "Локатор успешно добавлен!");
-  }
-  delete pInputDialog;
-}
-
-void Widget::deleteLocators()
-{
-  unsigned idx = ui->tabWidget->currentIndex();
-
-  if (idx < locators.size()) {
-    Locators::iterator it = locators.begin();
-    for (unsigned i = 0; i < idx; ++i) it++;
-    locators.erase(it);
-    QMessageBox::information(0, "Удаление РЛС",
-                            "Локатор " + QString::number(idx+1) + " успешно удален!");
-  }
-
-  updateLocators();
-  updateTabWidget();
-}
-
 void Widget::updateLocators()
 {
-  for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
-    it->setFirstDiscr(params->getFirstDiscr());
-    it->setLastDiscr(params->getLastDiscr());
-    it->setMinAmpl(params->getMinAmpl());
-    it->setColorInvert(params->getIsColorInvert());
-  }
-
-  mv->updateLocators(&locators);
+  locators_ctrl.updateCommonParams(params.getCommonParams());
+  mv->updateLocators(&locators_ctrl.getLocators());
 }
 
 void Widget::updateTargets()
 {
   mv->updateTargets(&targets);
-  mv->updateLocAzimuths(&locators);
+  mv->updateLocAzimuths(&locators_ctrl.getLocators());
 
-  for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
+  for (Locators::iterator it = locators_ctrl.getLocators().begin();
+                          it != locators_ctrl.getLocators().end(); ++it)
+  {
     it->writeToFile(targets);
   }
 }
 
-void Widget::updateTabWidget()
-{
-  int i = 0;
-  int cur = ui->tabWidget->currentIndex();
-  ui->tabWidget->clear();
-
-  for (Locators::iterator it = locators.begin(); it != locators.end(); ++it, ++i) {
-    ui->tabWidget->addTab(&it->getLocatorWidget(), "РЛС " + QString::number(i+1));
-  }
-  if (cur <= i)
-    ui->tabWidget->setCurrentIndex(cur);
-}
-
 void Widget::optimizeView()
 {
-  mv->resetView(&locators);
+  mv->resetView(&locators_ctrl.getLocators());
 }
 
 void Widget::startImit()
@@ -164,7 +108,8 @@ void Widget::startImit()
     it->start();
   }
   unsigned idx = 1;
-  for (Locators::iterator it = locators.begin(); it != locators.end(); ++it, ++idx) {
+  for (Locators::iterator it = locators_ctrl.getLocators().begin();
+                          it != locators_ctrl.getLocators().end(); ++it, ++idx) {
     QString name = "RLS_" + QString::number(idx) + "_Data.b";
     it->start();
     it->setOutFile(name.toStdString().c_str());
@@ -173,7 +118,8 @@ void Widget::startImit()
 
 void Widget::stopImit()
 {
-  for (Locators::iterator it = locators.begin(); it != locators.end(); ++it) {
+  for (Locators::iterator it = locators_ctrl.getLocators().begin();
+                          it != locators_ctrl.getLocators().end(); ++it) {
     it->closeFile();
   }
   timer.stop();

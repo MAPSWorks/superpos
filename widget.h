@@ -14,8 +14,8 @@
 #include <list>
 
 #include "mapviewer.h"
-#include "locator.h"
 #include "params_groupbox.h"
+#include "locators_ctrl.h"
 
 namespace Ui {
   class Widget;
@@ -30,11 +30,9 @@ class Widget : public QWidget
     ~Widget();
 
   public slots:
-    void addLocator();
-    void deleteLocators();
     void updateLocators();
     void updateTargets();
-    void updateTabWidget();
+
     void optimizeView();
 
     void addTargetPoint(const QMouseEvent*, QPointF);
@@ -55,9 +53,8 @@ class Widget : public QWidget
     // Временно
     PointsVector points_vector;
 
-    ParamsGroupBox *params;
-
-    Locators locators;
+    ParamsGroupBox params;
+    LocatorsCtrl locators_ctrl;
     Targets targets;
 };
 
