@@ -32,32 +32,6 @@
     <string>Обновить изображение</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbAddLoc">
-   <property name="geometry">
-    <rect>
-     <x>750</x>
-     <y>480</y>
-     <width>161</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Добавить локатор</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbDelLoc">
-   <property name="geometry">
-    <rect>
-     <x>750</x>
-     <y>520</y>
-     <width>161</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Удалить локатор</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pbReset">
    <property name="geometry">
     <rect>

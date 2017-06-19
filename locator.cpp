@@ -81,7 +81,7 @@ void Locator::writeToFile(Targets& targets)
     cps.push_back(p);
   }
 
-  cout << "CPs num = " << cps.size() << endl;
+  // cout << "CPs num = " << cps.size() << endl;
 
 
   double current_line_pos;
@@ -93,7 +93,7 @@ void Locator::writeToFile(Targets& targets)
 
     for (std::vector<LocCoordPoint>::iterator it = cps.begin(); it != cps.end(); ++it) {
 
-      cout << "CP: " << it->discr << " " << it->phi << endl;
+      //  cout << "CP: " << it->discr << " " << it->phi << endl;
 
       if ((fabs(current_line_pos * POS_TO_GRAD - it->phi) < 1000.0 / it->discr)
           && (it->discr < DISCR_NUM) && (it->discr > 10.0))

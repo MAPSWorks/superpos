@@ -18,11 +18,6 @@ Widget::Widget():
   mv->setView(locators_ctrl.getCenter());
   mv->updatePixmapAzim(DISCR_NUM*SCALE*METERS_IN_DISCR, 0);
 
-  // Панель локаторов
-  locators_ctrl.initTabWidget(this, QRect(0, 0, 340, 260));
-
-  connect(ui->pbAddLoc, SIGNAL(released()), &locators_ctrl, SLOT(addLocator()));
-  connect(ui->pbDelLoc, SIGNAL(released()), &locators_ctrl, SLOT(deleteLocators()));
   connect(ui->pbUpdate, SIGNAL(released()), &locators_ctrl, SLOT(updateTabWidget()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
@@ -42,9 +37,9 @@ Widget::Widget():
 
   // Объединяем панели в ToolBox
   QToolBox *tb = new QToolBox(this);
-  tb->addItem(&locators_ctrl.getTabWidget(), "Локаторы");
+  tb->addItem(&locators_ctrl, "Локаторы");
   tb->addItem(&params, "Общие параметры");
-  tb->setGeometry(680, 20, 340, 350);
+  tb->setGeometry(670, 20, 350, 400);
 
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
@@ -121,7 +116,7 @@ void Widget::endAddTarget()
   disconnect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
           this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
   if (!points_vector.empty())
-    targets.push_back(Target(new PoligonalMotionModel(points_vector, 0.001)));
+    targets.push_back(Target(new LinearTrajectory(points_vector)));
   points_vector.clear();
 
   ui->labelTargNum->setText("Количество целей - " + QString::number(targets.size()));

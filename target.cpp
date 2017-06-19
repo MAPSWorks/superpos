@@ -2,28 +2,28 @@
 
 #include <iostream>
 
-Target::Target(BaseMotionModel *m):
-  motion(m)
+Target::Target(BaseTrajectory *tr):
+  traj(tr)
 {
 
 }
 
-/*
 void Target::start()
 {
   startTime = chrono::system_clock::now();
 }
 
-QPointF Target::getCoords()
+double Target::getTimeDelta()
 {
   chrono::time_point<chrono::system_clock> cur = std::chrono::system_clock::now();
-
   double elaps_ns = chrono::duration_cast<std::chrono::nanoseconds>
                            (cur-startTime).count();
-
-  // cout << "Elapsed ns = " << elaps_ns << endl;
-
   double t = elaps_ns * 1e-9;
-  return coord0 + vel * t;
+
+  return t;
 }
-*/
+
+QPointF Target::getCoords()
+{
+  return traj -> getCoords(getTimeDelta(), 0.001, 0.0005);
+}

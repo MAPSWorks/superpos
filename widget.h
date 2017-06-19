@@ -54,7 +54,7 @@ class Widget : public QWidget
     PointsVector points_vector;
 
     ParamsGroupBox params;
-    LocatorsCtrl locators_ctrl;
+    LocatorsCtrl   locators_ctrl;
     Targets targets;
 };
 

@@ -5,11 +5,12 @@
 #include <QTabWidget>
 #include <QPointF>
 #include <QMessageBox>
+#include <QPushButton>
 
 #include "locator.h"
 #include "params_groupbox.h"
 
-class LocatorsCtrl: public QObject
+class LocatorsCtrl: public QWidget
 {
   Q_OBJECT
 
@@ -17,10 +18,8 @@ class LocatorsCtrl: public QObject
     LocatorsCtrl();
 
     Locators& getLocators() { return locators; }
-    QTabWidget& getTabWidget()  { return tab_wgt; }
 
     QPointF getCenter();
-    void initTabWidget(QWidget*, const QRect&);
     void updateCommonParams(const CommonParams& p);
 
   signals:
@@ -28,12 +27,15 @@ class LocatorsCtrl: public QObject
 
   public slots:
     void addLocator();
-    void deleteLocators();
+    void deleteLocator();
     void updateTabWidget();
 
   private:
     Locators locators;
     QTabWidget tab_wgt;
+
+    QPushButton pbAddLoc,\
+                pbDelLoc;
 };
 
 #endif // LOCATORSCTRL_H

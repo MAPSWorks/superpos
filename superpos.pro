@@ -24,9 +24,9 @@ SOURCES += main.cpp\
     mapviewer.cpp \
     dialog.cpp \
     loc_widget.cpp \
-    motion.cpp \
     params_groupbox.cpp \
-    locators_ctrl.cpp
+    locators_ctrl.cpp \
+    trajectory.cpp
 
 HEADERS  += widget.h \
     parser.h \
@@ -36,9 +36,10 @@ HEADERS  += widget.h \
     mapviewer.h \
     dialog.h \
     loc_widget.h \
-    motion.h \
     params_groupbox.h \
-    locators_ctrl.h
+    locators_ctrl.h \
+    trajectory.h \
+    tools.h
 
 FORMS    += widget.ui
 

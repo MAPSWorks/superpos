@@ -1,6 +1,8 @@
 #include "locators_ctrl.h"
 #include "dialog.h"
 
+#include <QGridLayout>
+
 LocatorsCtrl::LocatorsCtrl()
 {
   locators.clear();
@@ -10,6 +12,24 @@ LocatorsCtrl::LocatorsCtrl()
              "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 501); // 44 град
 
   updateTabWidget();
+
+  pbAddLoc.setText("Добавить РЛС");
+  pbAddLoc.setGeometry(0,0, 100, 20);
+  pbDelLoc.setText("Удалить РЛС");
+  pbDelLoc.setGeometry(0,0, 100, 20);
+
+  connect(&pbAddLoc, SIGNAL(released()), SLOT(addLocator()));
+  connect(&pbDelLoc, SIGNAL(released()), SLOT(deleteLocator()));
+
+  QHBoxLayout * hLayout = new QHBoxLayout;
+  hLayout->addWidget(&pbAddLoc);
+  hLayout->addWidget(&pbDelLoc);
+
+  QVBoxLayout * vLayout = new QVBoxLayout;
+  vLayout->addWidget(&tab_wgt);
+  vLayout->addLayout(hLayout);
+
+  setLayout(vLayout);
 }
 
 void LocatorsCtrl::addLocator()
@@ -37,7 +57,7 @@ void LocatorsCtrl::addLocator()
   delete pInputDialog;
 }
 
-void LocatorsCtrl::deleteLocators()
+void LocatorsCtrl::deleteLocator()
 {
   unsigned idx = tab_wgt.currentIndex();
 
@@ -71,12 +91,6 @@ void LocatorsCtrl::updateCommonParams(const CommonParams& p)
     it->setMinAmpl(p.min_ampl);
     it->setColorInvert(p.is_color_invert);
   }
-}
-
-void LocatorsCtrl::initTabWidget(QWidget* parent, const QRect& geom)
-{
-  tab_wgt.setParent(parent);
-  tab_wgt.setGeometry(geom);
 }
 
 void LocatorsCtrl::updateTabWidget()
