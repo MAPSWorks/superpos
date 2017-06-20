@@ -34,7 +34,7 @@ LocatorsCtrl::LocatorsCtrl()
 
 void LocatorsCtrl::addLocator()
 {
-  InputDialog* pInputDialog = new InputDialog;
+  LocatorDialog* pInputDialog = new LocatorDialog;
   if (pInputDialog->exec() == QDialog::Accepted) {
     bool ok1, ok2;
     double lat = pInputDialog->latitude().toDouble(&ok1);

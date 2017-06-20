@@ -1,7 +1,7 @@
 #ifndef LOCATORSCTRL_H
 #define LOCATORSCTRL_H
 
-#include <QObject>
+#include <QWidget>
 #include <QTabWidget>
 #include <QPointF>
 #include <QMessageBox>

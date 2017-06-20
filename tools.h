@@ -4,22 +4,22 @@
 #include <iostream>
 using namespace std;
 
-inline bool findRootTime(double& t, const double& x,
-                         const double& v, const double& a)
+inline bool findRootSqr(double& t, const double& a,
+                         const double& b, const double& c)
 {
   double t1, t2, D;
 
-  D = v*v - 4*a*x;
+  D = b*b - 4*a*c;
 
   if (D < 0) return false;
 
   if (a < 1e-6) {
-    if (v < 1e-6) return false;
-    t = x / v;
+    if (b < 1e-6) return false;
+    t = - c / b;
   }
   else {
-    t1 = (-v - sqrt(D)) / (2*a);
-    t2 = (-v + sqrt(D)) / (2*a);
+    t1 = (-b - sqrt(D)) / (2*a);
+    t2 = (-b + sqrt(D)) / (2*a);
 
     if ((t1 < 0) && (t2 < 0)) return false;
 

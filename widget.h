@@ -16,6 +16,7 @@
 #include "mapviewer.h"
 #include "params_groupbox.h"
 #include "locators_ctrl.h"
+#include "targets_ctrl.h"
 
 namespace Ui {
   class Widget;
@@ -55,6 +56,8 @@ class Widget : public QWidget
 
     ParamsGroupBox params;
     LocatorsCtrl   locators_ctrl;
+    TargetsCtrl    targets_ctrl;
+
     Targets targets;
 };
 

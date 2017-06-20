@@ -6,8 +6,9 @@
 #include <QDialog>
 
 class QLineEdit;
+class QSpinBox;
 
-class InputDialog : public QDialog {
+class LocatorDialog : public QDialog {
     Q_OBJECT
 private:
     QLineEdit* lat;
@@ -15,11 +16,26 @@ private:
     QString    fname;
 
 public:
-    InputDialog(QWidget* pwgt = 0);
+    LocatorDialog(QWidget* pwgt = 0);
 
     QString filename() const;
     QString latitude() const;
     QString longitude() const;
+};
+
+class TargetDialog : public QDialog {
+    Q_OBJECT
+private:
+    QSpinBox*  traj;
+    QLineEdit* vel;
+    QLineEdit* acc;
+
+public:
+    TargetDialog(unsigned, QWidget* pwgt = 0);
+
+    unsigned traj_num() const;
+    QString velocity() const;
+    QString accel() const;
 };
 
 #endif // DIALOG_H

@@ -3,7 +3,7 @@
 #include <iostream>
 
 Target::Target(BaseTrajectory *tr):
-  traj(tr)
+  traj(tr), vel(0), acc(0)
 {
 
 }
@@ -11,6 +11,11 @@ Target::Target(BaseTrajectory *tr):
 void Target::start()
 {
   startTime = chrono::system_clock::now();
+}
+
+bool Target::isExistingNow()
+{
+  return (chrono::system_clock::now() > startTime);
 }
 
 double Target::getTimeDelta()
@@ -25,5 +30,5 @@ double Target::getTimeDelta()
 
 QPointF Target::getCoords()
 {
-  return traj -> getCoords(getTimeDelta(), 0.001, 0.0005);
+  return traj -> getCoords(getTimeDelta(), vel, acc);
 }

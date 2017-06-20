@@ -38,9 +38,9 @@ Widget::Widget():
   // Объединяем панели в ToolBox
   QToolBox *tb = new QToolBox(this);
   tb->addItem(&locators_ctrl, "Локаторы");
-  tb->addItem(&params, "Общие параметры");
+  tb->addItem(&targets_ctrl,  "Цели");
+  tb->addItem(&params,        "Общие параметры");
   tb->setGeometry(670, 20, 350, 400);
-
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
