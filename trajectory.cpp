@@ -8,7 +8,6 @@ using namespace std;
 BaseTrajectory::BaseTrajectory(PointsVector pv):
   points(pv)
 {
-
 }
 
 LinearTrajectory::LinearTrajectory(PointsVector pv):
@@ -31,6 +30,7 @@ QPointF LinearTrajectory::getCoords(double t, double vel, double acc)
     vel += acc * t_prev;
 
     bool can_get_next_point = findRootSqr(delta_t, acc/2, vel, -abs_d);
+
     if (!can_get_next_point)
       return points[i] + vel * (d / abs_d) * (t - t_prev) / 2;
 

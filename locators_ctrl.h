@@ -28,13 +28,13 @@ class LocatorsCtrl: public QWidget
   public slots:
     void addLocator();
     void deleteLocator();
-    void updateTabWidget();
+    void updateWidget();
 
   private:
     Locators locators;
     QTabWidget tab_wgt;
 
-    QPushButton pbAddLoc,\
+    QPushButton pbAddLoc,
                 pbDelLoc;
 };
 

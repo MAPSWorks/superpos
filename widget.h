@@ -17,6 +17,8 @@
 #include "params_groupbox.h"
 #include "locators_ctrl.h"
 #include "targets_ctrl.h"
+#include "trajs_ctrl.h"
+
 
 namespace Ui {
   class Widget;
@@ -36,14 +38,8 @@ class Widget : public QWidget
 
     void optimizeView();
 
-    void addTargetPoint(const QMouseEvent*, QPointF);
-
     void startImit();
     void stopImit();
-
-    void beginAddTarget();
-    void endAddTarget();
-    void deleteTargets();
 
   private:
     Ui::Widget *ui;
@@ -51,14 +47,10 @@ class Widget : public QWidget
 
     QTimer timer;
 
-    // Временно
-    PointsVector points_vector;
-
     ParamsGroupBox params;
     LocatorsCtrl   locators_ctrl;
+    TrajsCtrl      trajs_ctrl;
     TargetsCtrl    targets_ctrl;
-
-    Targets targets;
 };
 
 #endif // WIDGET_H

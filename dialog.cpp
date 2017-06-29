@@ -56,7 +56,7 @@ TargetDialog::TargetDialog(unsigned N, QWidget* pwgt/*= 0*/)
     vel = new QLineEdit;
     acc  = new QLineEdit;
 
-    traj->setMaximum(N);
+    traj->setRange(1,N);
 
     QLabel* l_traj = new QLabel("&Траектория");
     QLabel* l_vel = new QLabel("&Скорость");

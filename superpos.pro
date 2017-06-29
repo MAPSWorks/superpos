@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     params_groupbox.cpp \
     locators_ctrl.cpp \
     trajectory.cpp \
-    targets_ctrl.cpp
+    targets_ctrl.cpp \
+    trajs_ctrl.cpp
 
 HEADERS  += widget.h \
     parser.h \
@@ -41,7 +42,8 @@ HEADERS  += widget.h \
     locators_ctrl.h \
     trajectory.h \
     tools.h \
-    targets_ctrl.h
+    targets_ctrl.h \
+    trajs_ctrl.h
 
 FORMS    += widget.ui
 

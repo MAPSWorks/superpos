@@ -26,4 +26,6 @@ class LinearTrajectory : public BaseTrajectory
     QPointF getCoords(double t, double v, double a);
 };
 
+typedef std::vector<BaseTrajectory*> Trajectories;
+
 #endif // TRAJECTORY_H

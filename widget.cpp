@@ -18,18 +18,16 @@ Widget::Widget():
   mv->setView(locators_ctrl.getCenter());
   mv->updatePixmapAzim(DISCR_NUM*SCALE*METERS_IN_DISCR, 0);
 
-  connect(ui->pbUpdate, SIGNAL(released()), &locators_ctrl, SLOT(updateTabWidget()));
+  trajs_ctrl.setMapViewer(mv);
+  targets_ctrl.setTrajsCtrl(&trajs_ctrl);
+
+  connect(ui->pbUpdate, SIGNAL(released()), &locators_ctrl, SLOT(updateWidget()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
   connect(&locators_ctrl, SIGNAL(eventUpdate()), this, SLOT(updateLocators()));
 
   // Панель общих параметров
   params.init(this, QRect(0, 0, 340, 200));
-
-  // Управление целями
-  connect(ui->pbBeginAddTarg, SIGNAL(released()), SLOT(beginAddTarget()));
-  connect(ui->pbEndAddTarg,   SIGNAL(released()), SLOT(endAddTarget()));
-  connect(ui->pbDeleteTargs,  SIGNAL(released()), SLOT(deleteTargets()));
 
   // Управление имитацией
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
@@ -38,9 +36,10 @@ Widget::Widget():
   // Объединяем панели в ToolBox
   QToolBox *tb = new QToolBox(this);
   tb->addItem(&locators_ctrl, "Локаторы");
+  tb->addItem(&trajs_ctrl,    "Траектории");
   tb->addItem(&targets_ctrl,  "Цели");
   tb->addItem(&params,        "Общие параметры");
-  tb->setGeometry(670, 20, 350, 400);
+  tb->setGeometry(670, 20, 350, 500);
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
@@ -60,14 +59,14 @@ void Widget::updateLocators()
 }
 
 void Widget::updateTargets()
-{
-  mv->updateTargets(&targets);
+{<
+  mv->updateTargets(&targets_ctrl.getTargets());
   mv->updateLocAzimuths(&locators_ctrl.getLocators());
 
   for (Locators::iterator it = locators_ctrl.getLocators().begin();
                           it != locators_ctrl.getLocators().end(); ++it)
   {
-    it->writeToFile(targets);
+    it->writeToFile(targets_ctrl.getTargets());
   }
 }
 
@@ -78,6 +77,7 @@ void Widget::optimizeView()
 
 void Widget::startImit()
 {
+  Targets& targets = targets_ctrl.getTargets();
   if (targets.empty()) {
     QMessageBox::information(0, "Запуск имитации", "Нет целей для имитации.");
     return;
@@ -103,36 +103,4 @@ void Widget::stopImit()
     it->closeFile();
   }
   timer.stop();
-}
-
-void Widget::beginAddTarget()
-{
-  connect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
-          this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
-}
-
-void Widget::endAddTarget()
-{
-  disconnect(mv, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
-          this, SLOT(addTargetPoint(const QMouseEvent*,QPointF)));
-  if (!points_vector.empty())
-    targets.push_back(Target(new LinearTrajectory(points_vector)));
-  points_vector.clear();
-
-  ui->labelTargNum->setText("Количество целей - " + QString::number(targets.size()));
-}
-
-void Widget::deleteTargets()
-{
-  points_vector.clear();
-  targets.clear();
-  ui->labelTargNum->setText("Количество целей - " + QString::number(targets.size()));
-}
-
-void Widget::addTargetPoint(const QMouseEvent* e, QPointF p)
-{
-  if (e->type() == QEvent::MouseButtonPress) {
-    cout << "Point " << p.x() << " " << p.y() << endl;
-    points_vector.push_back(p);
-  }
 }

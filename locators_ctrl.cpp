@@ -11,7 +11,7 @@ LocatorsCtrl::LocatorsCtrl()
   locators.back().init(QPointF(COORDS(34.0, 59.0, 44.07), COORDS(56.0,  8.0, 49.83)),
              "/windows/Work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 501); // 44 град
 
-  updateTabWidget();
+  updateWidget();
 
   pbAddLoc.setText("Добавить РЛС");
   pbAddLoc.setGeometry(0,0, 100, 20);
@@ -49,7 +49,7 @@ void LocatorsCtrl::addLocator()
     locators.push_back(Locator());
     locators.back().init(QPointF(lat, lon), fname.toStdString().c_str(), 0);
 
-    updateTabWidget();
+    updateWidget();
     emit eventUpdate();
 
     QMessageBox::information(0, "Добавление РЛС", "Локатор успешно добавлен!");
@@ -69,7 +69,7 @@ void LocatorsCtrl::deleteLocator()
                             "Локатор " + QString::number(idx+1) + " успешно удален!");
   }
 
-  updateTabWidget();
+  updateWidget();
   emit eventUpdate();
 }
 
@@ -93,7 +93,7 @@ void LocatorsCtrl::updateCommonParams(const CommonParams& p)
   }
 }
 
-void LocatorsCtrl::updateTabWidget()
+void LocatorsCtrl::updateWidget()
 {
   int i = 0;
   int cur = tab_wgt.currentIndex();

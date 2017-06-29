@@ -8,12 +8,17 @@
 #include <QPointF>
 
 #include "target.h"
+#include "trajs_ctrl.h"
 
 class TargetsCtrl : public QWidget
 {
     Q_OBJECT
   public:
     explicit TargetsCtrl(QWidget *parent = 0);
+
+    Targets& getTargets() { return targets; }
+
+    void setTrajsCtrl(TrajsCtrl * t) {trajs_ctrl = t;}
 
   signals:
     void eventUpdate();
@@ -24,8 +29,10 @@ class TargetsCtrl : public QWidget
     void updateWidget();
 
   private:
-    Targets targets;
+    Targets    targets;
     QTabWidget tab_wgt;
+
+    TrajsCtrl* trajs_ctrl;
 
     QPushButton pbAddTarg,
                 pbDelTarg;

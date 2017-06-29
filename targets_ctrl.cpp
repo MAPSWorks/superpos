@@ -7,8 +7,6 @@ TargetsCtrl::TargetsCtrl(QWidget *parent) : QWidget(parent)
 {
   targets.clear();
 
-  // targets.push_back();
-
   updateWidget();
 
   pbAddTarg.setText("Добавить цель");
@@ -32,10 +30,17 @@ TargetsCtrl::TargetsCtrl(QWidget *parent) : QWidget(parent)
 
 void TargetsCtrl::addTarget()
 {
-  TargetDialog* pDialog = new TargetDialog(3);
+  Trajectories trajs = trajs_ctrl->getTrajs();
+
+  if ((trajs_ctrl == NULL) || (trajs.empty())) {
+    QMessageBox::information(0, "Добавление цели", "Нет ни одной заданной траектории.");
+    return;
+  }
+
+  TargetDialog* pDialog = new TargetDialog(trajs.size());
   if (pDialog->exec() == QDialog::Accepted) {
     bool ok1, ok2;
-    unsigned traj_num = pDialog->traj_num();
+    unsigned traj_num = pDialog->traj_num() - 1;
     double vel = pDialog->velocity().toDouble(&ok1);
     double acc = pDialog->accel().toDouble(&ok2);
 
@@ -44,8 +49,14 @@ void TargetsCtrl::addTarget()
       return;
     }
 
-    Target targ(new LinearTrajectory(PointsVector()));
-    //targ.setTraj(trajs[traj_num]);
+    Trajectories trajs = trajs_ctrl->getTrajs();
+
+    cout << trajs.size() << " " << traj_num << endl;
+
+    if (trajs.size() <= traj_num) return;
+
+    Target targ(trajs[traj_num]);
+
     targ.setVel(vel);
     targ.setAcc(acc);
     targets.push_back(targ);

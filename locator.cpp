@@ -60,8 +60,6 @@ void Locator::writeToFile(Targets& targets)
   double x, y, z;
   LocalCartesian proj(lat0, lon0, h0, earth);
 
-  cout << "Targets num = " << targets.size() << endl;
-
   for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
     double lat = it->getCoords().y(),
            lon = it->getCoords().x(),
@@ -73,16 +71,11 @@ void Locator::writeToFile(Targets& targets)
     p.discr = sqrt(x*x + y*y) / METERS_IN_DISCR;
     p.phi = 180.0 / 3.14 * atan(-y / x);
 
-    cout << "x, y: " << x << " " << y << endl;
-
     if (x < 0) p.phi += 180.0;
     if ((x > 0) && (y > 0)) p.phi += 360.0;
 
     cps.push_back(p);
   }
-
-  // cout << "CPs num = " << cps.size() << endl;
-
 
   double current_line_pos;
 
@@ -92,8 +85,6 @@ void Locator::writeToFile(Targets& targets)
     DATA_PACKAGE_AD d = *it_data;
 
     for (std::vector<LocCoordPoint>::iterator it = cps.begin(); it != cps.end(); ++it) {
-
-      //  cout << "CP: " << it->discr << " " << it->phi << endl;
 
       if ((fabs(current_line_pos * POS_TO_GRAD - it->phi) < 1000.0 / it->discr)
           && (it->discr < DISCR_NUM) && (it->discr > 10.0))
@@ -140,10 +131,6 @@ void Locator::updatePixmap()
     for (unsigned i = first_discr; i < last_discr; i++) {
       float x = it->data.out_data.spectr[i];
 
-/*
-      if (i == 1000)
-        x = 100000;
-*/
       QColor color;
 
       if (x < min_ampl)
