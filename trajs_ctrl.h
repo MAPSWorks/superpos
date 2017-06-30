@@ -40,6 +40,8 @@ class TrajsCtrl: public QWidget
 
     Mapviewer *map_viewer;
 
+    LineString* linestring;
+
     QPushButton pbBeginAddTraj,
                 pbEndAddTraj,
                 pbDelTraj;

@@ -59,7 +59,7 @@ void Widget::updateLocators()
 }
 
 void Widget::updateTargets()
-{<
+{
   mv->updateTargets(&targets_ctrl.getTargets());
   mv->updateLocAzimuths(&locators_ctrl.getLocators());
 

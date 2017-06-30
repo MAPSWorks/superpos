@@ -45,6 +45,9 @@ Mapviewer::Mapviewer(QWidget *parent):
   loclayer = new GeometryLayer("Locators", mapadapter);
   mc->addLayer(loclayer);
 
+  trajlayer = new GeometryLayer("Trajs", mapadapter);
+  mc->addLayer(trajlayer);
+
   targlayer = new GeometryLayer("Targets", mapadapter);
   mc->addLayer(targlayer);
 
@@ -95,6 +98,25 @@ void Mapviewer::updateTargets(Targets* targets)
     pxm.fill(Qt::red);
     Point *targ = new Point(crd.x(), crd.y(), pxm);
     targlayer->addGeometry(targ);
+  }
+}
+
+void Mapviewer::updateTrajs(Trajectories* trajs)
+{
+  if (trajlayer == NULL) return;
+
+  trajlayer->clearGeometries();
+
+  QPixmap pxm(10,10);
+  pxm.fill(Qt::blue);
+
+  for (Trajectories::iterator it = trajs->begin(); it != trajs->end(); ++it) {
+    PointsVector pv = (*it)->getPoints();
+
+    for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
+      Point *tr = new Point(it_p->x(), it_p->y(), pxm);
+      trajlayer->addGeometry(tr);
+    }
   }
 }
 
