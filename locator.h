@@ -3,6 +3,7 @@
 
 #include <QPainter>
 #include <QPixmap>
+#include <QUdpSocket>
 
 #include <vector>
 #include <list>
@@ -69,7 +70,9 @@ class Locator
     DataCont data;
     QPixmap  pixmap;
     DataCont::iterator it_data;
-    std::ofstream      out_file;
+
+    std::ofstream out_file;
+    QUdpSocket    udp;
 
     QPointF  center;      // Координаты центра
     unsigned first_discr, // Начало вывода (дискр. дальн.)

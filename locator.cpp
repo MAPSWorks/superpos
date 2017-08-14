@@ -94,7 +94,8 @@ void Locator::writeToFile(Targets& targets)
       }
     }
 
-    out_file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
+    //out_file.write((char*)&d, sizeof(DATA_PACKAGE_AD));
+    udp.writeDatagram((char*)&d, sizeof(DATA_PACKAGE_AD), QHostAddress::LocalHost, 2424);
 
     it_data++;
     if (it_data == data.end())
