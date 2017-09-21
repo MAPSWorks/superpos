@@ -21,6 +21,7 @@
 
 #include "locator.h"
 #include "target.h"
+//#include "trajs_ctrl.h"
 #include "trajectory.h"
 
 using namespace qmapcontrol;
@@ -33,11 +34,12 @@ public:
     Mapviewer(QWidget* parent = 0);
     ~Mapviewer();
 
+    void setTrajsContainer(Trajectories* tr) {trajs = tr;}
+
     void setView(const QPointF& c) {mc->setView(c);}
     void updateLocators(Locators*);
     void updateLocAzimuths(Locators*);
     void updateTargets(Targets*);
-    void updateTrajs(Trajectories*);
     void resetView(Locators*);
 
     void updatePixmapAzim(int, int);
@@ -47,6 +49,11 @@ public:
     void updateTrajLayer() { mc->update(); }
 
     int getZoomLevel() { return mapadapter->adaptedZoom(); }
+
+public slots:
+    void updateTraj(unsigned);
+    void deleteTraj(unsigned);
+    void updateTrajs();
 
 signals:
     void mouseEventCoordinate (const QMouseEvent* e, const QPointF p);
@@ -61,6 +68,8 @@ private:
     Layer* notes;
     QLabel* zoomlabel;
     QPixmap pixmap_azim;
+
+    Trajectories* trajs;
 
     void addZoomButtons();
     void addZoomLabel();

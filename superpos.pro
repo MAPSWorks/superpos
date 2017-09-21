@@ -28,7 +28,10 @@ SOURCES += main.cpp\
     locators_ctrl.cpp \
     trajectory.cpp \
     targets_ctrl.cpp \
-    trajs_ctrl.cpp
+    trajs_ctrl.cpp \
+    #trajs_model.cpp \
+    treeitem.cpp \
+    treemodel.cpp
 
 HEADERS  += widget.h \
     parser.h \
@@ -43,7 +46,10 @@ HEADERS  += widget.h \
     trajectory.h \
     tools.h \
     targets_ctrl.h \
-    trajs_ctrl.h
+    trajs_ctrl.h \
+    #trajs_model.h \
+    treeitem.h \
+    treemodel.h
 
 FORMS    += widget.ui
 

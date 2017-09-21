@@ -19,6 +19,7 @@ Widget::Widget():
   mv->updatePixmapAzim(DISCR_NUM*SCALE*METERS_IN_DISCR, 0);
 
   trajs_ctrl.setMapViewer(mv);
+  mv->setTrajsContainer(&trajs_ctrl.getTrajs());
   targets_ctrl.setTrajsCtrl(&trajs_ctrl);
 
   connect(ui->pbUpdate, SIGNAL(released()), &locators_ctrl, SLOT(updateWidget()));

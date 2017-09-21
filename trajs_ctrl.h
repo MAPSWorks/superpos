@@ -6,9 +6,11 @@
 #include <QPointF>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTreeView>
 
-#include "trajectory.h"
 #include "mapviewer.h"
+#include "trajs_model.h"
+#include "treemodel.h"
 
 class TrajsCtrl: public QWidget
 {
@@ -31,10 +33,13 @@ class TrajsCtrl: public QWidget
     void updateWidget();
 
     void addTrajPoint(const QMouseEvent*, QPointF);
+    void onDataChanged(QModelIndex, QModelIndex, QVector<int>);
 
   private:
     Trajectories trajs;
     QTabWidget tab_wgt;
+    TreeModel *trajs_model;
+    QTreeView tree_view;
 
     PointsVector points_vector;
 

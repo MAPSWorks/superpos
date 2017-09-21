@@ -14,6 +14,7 @@ class BaseTrajectory
 
     virtual QPointF getCoords(double, double, double) = 0;
     const PointsVector& getPoints() { return points; }
+    void setPoints(PointsVector& pv) { points = pv; }
 
   protected:
     PointsVector points;
