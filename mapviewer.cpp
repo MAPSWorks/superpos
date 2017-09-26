@@ -105,20 +105,18 @@ void Mapviewer::updateTrajs()
 {
   if (trajlayer == NULL) return;
 
-  //trajlayer->clearGeometries();
+  trajlayer->clearGeometries();
 
-  QPixmap pxm(10,10);
-  pxm.fill(Qt::blue);
-
-  //trajlayer->addGeometry(geom[idx]);
+  QPen* pen = new QPen(QColor(0,255,0, 100), 3);
 
   for (Trajectories::iterator it = trajs->begin(); it != trajs->end(); ++it) {
+    LineString * ls = new LineString();
+    ls->setPen(pen);
     PointsVector pv = (*it)->getPoints();
-
-   /* for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
-      Point *tr = new Point(it_p->x(), it_p->y(), pxm);
-      trajlayer->addGeometry(tr);
-    }*/
+    for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
+      ls->addPoint(new CirclePoint(it_p->x(), it_p->y(), 10, QString(), Point::Middle, pen));
+    }
+    trajlayer->addGeometry(ls);
   }
 }
 
@@ -149,13 +147,18 @@ void Mapviewer::updateTraj(unsigned idx)
 
 void Mapviewer::deleteTraj(unsigned idx)
 {
+   cout << "geom: idx = " << idx;
+
   if (trajlayer == NULL) return;
-  if (idx >= trajs->size()) return;
 
   QList<Geometry*> &geom = trajlayer->getGeometries();
   if (idx >= geom.size()) return;
 
+  cout << ", size = " << geom.size();
+
   geom.removeAt(idx);
+
+  cout << ", size = " << geom.size() << endl;
 
   mc->update();
 }

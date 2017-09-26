@@ -53,9 +53,28 @@
 
 #include <QAbstractItemModel>
 #include <QModelIndex>
+#include <QStyledItemDelegate>
 #include <QVariant>
 
 class TreeItem;
+
+class DoubleSpinBoxDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    DoubleSpinBoxDelegate(QObject *parent = 0);
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const override;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const override;
+
+    void updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
 
 //! [0]
 class TreeModel : public QAbstractItemModel

@@ -10,12 +10,7 @@ TrajsCtrl::TrajsCtrl(QWidget *parent) :
 {
   QStringList headers;
   headers << tr("lat") << tr("lon");
-
-  QFile file("./default.txt");
-  file.open(QIODevice::ReadOnly);
-
   trajs_model = new TreeModel(headers, QString());
-  file.close();
 
   trajs.clear();
 
@@ -44,6 +39,7 @@ TrajsCtrl::TrajsCtrl(QWidget *parent) :
 
   tree_view.setModel(trajs_model);
   tree_view.setWindowTitle(QObject::tr("Simple Tree Model"));
+  tree_view.setItemDelegate(new DoubleSpinBoxDelegate);
 
   QVBoxLayout * vLayout = new QVBoxLayout;
   vLayout->addWidget(&tree_view);
@@ -130,13 +126,28 @@ void TrajsCtrl::deleteTraj()
   else
     idx = index.parent().row();
 
+  cout << "TrajsCtrl::deleteTraj(), idx = " << idx << endl;
+
   if (idx < trajs.size()) {
+    disconnect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+               this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
+
     Trajectories::iterator it = trajs.begin();
     for (unsigned i = 0; i < idx; ++i) it++;
     trajs.erase(it);
 
-    trajs_model->removeRow(idx, tree_view.rootIndex());
+    QModelIndex root = tree_view.rootIndex();
+    trajs_model->removeRow(idx, root);
+    unsigned tr_num = trajs_model->rowCount(root);
+    for (unsigned i = 0; i < tr_num; ++i) {
+      QModelIndex index = trajs_model->index(i, 0, root);
+      trajs_model->setData(index, "Traj " + QString::number(i + 1), Qt::EditRole);
+    }
+
     map_viewer->deleteTraj(idx);
+
+    connect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+            this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 
     QMessageBox::information(0, "Удаление траектории",
                             "Траектория " + QString::number(idx+1)
