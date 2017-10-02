@@ -51,12 +51,14 @@ public:
     int getZoomLevel() { return mapadapter->adaptedZoom(); }
 
 public slots:
-    void updateTraj(unsigned);
-    void deleteTraj(unsigned);
+    void updateTraj(int);
+    void deleteTraj(int);
     void updateTrajs();
+    void selectTraj(int);
 
 signals:
-    void mouseEventCoordinate (const QMouseEvent* e, const QPointF p);
+    void mouseEventCoordinate(const QMouseEvent* e, const QPointF p);
+    void trajClicked(int);
 
 private:
     MapControl* mc;
@@ -71,15 +73,17 @@ private:
 
     Trajectories* trajs;
 
+    QPen * penActiveTraj,
+         * penInactiveTraj;
+
     void addZoomButtons();
     void addZoomLabel();
 
 protected slots:
     void updateViewLabels(const QPointF&, int);
-    void onMouseEventCoordinate(const QMouseEvent* e, const QPointF p)
-      { emit mouseEventCoordinate(e, p); }
+    void onMouseEventCoordinate(const QMouseEvent*, const QPointF p);
 
-    void onGeometryClicked(Geometry*, QPoint) {std::cout << "onGeometryClicked" << std::endl;}
+    void onTrajClicked(Geometry* g, QPoint);
     void onUpdateRequest()  {std::cout << "onUpdateRequest" << std::endl;}
 
 protected:

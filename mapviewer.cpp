@@ -25,7 +25,6 @@ using namespace GeographicLib;
 Mapviewer::Mapviewer(QWidget *parent):
   QWidget(parent)
 {
- // create MapControl
   mc = new MapControl(this);
 
   mc->setBackgroundRole(QPalette::Shadow);
@@ -36,8 +35,8 @@ Mapviewer::Mapviewer(QWidget *parent):
   mainlayer = new MapLayer("GoogleMapLayer", mapadapter);
   mc->addLayer(mainlayer);
 
-  //mc->setHidden(true);
-  //mc->setDisabled(true);
+  penActiveTraj = new QPen(QColor(0,255,0, 150), 5);
+  penInactiveTraj = new QPen(QColor(0,255,0, 100), 3);
 
   addZoomButtons();
   mc->setZoom(DEFAULT_ZOOM_LEVEL);
@@ -55,6 +54,9 @@ Mapviewer::Mapviewer(QWidget *parent):
 
   connect(mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
           this, SLOT(onMouseEventCoordinate(const QMouseEvent*,QPointF)));
+
+  connect(trajlayer, SIGNAL(geometryClicked(Geometry*, QPoint)),
+          this, SLOT(onTrajClicked(Geometry*, QPoint)));
 }
 
 Mapviewer::~Mapviewer()
@@ -107,20 +109,19 @@ void Mapviewer::updateTrajs()
 
   trajlayer->clearGeometries();
 
-  QPen* pen = new QPen(QColor(0,255,0, 100), 3);
-
   for (Trajectories::iterator it = trajs->begin(); it != trajs->end(); ++it) {
     LineString * ls = new LineString();
-    ls->setPen(pen);
+    ls->setPen(penInactiveTraj);
     PointsVector pv = (*it)->getPoints();
     for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
-      ls->addPoint(new CirclePoint(it_p->x(), it_p->y(), 10, QString(), Point::Middle, pen));
+      ls->addPoint(new CirclePoint(it_p->x(), it_p->y(), 10, QString(),
+                                   Point::Middle, penInactiveTraj));
     }
     trajlayer->addGeometry(ls);
   }
 }
 
-void Mapviewer::updateTraj(unsigned idx)
+void Mapviewer::updateTraj(int idx)
 {
   if (trajlayer == NULL) return;
   if (idx >= trajs->size()) return;
@@ -131,13 +132,13 @@ void Mapviewer::updateTraj(unsigned idx)
 
   LineString * ls = new LineString();
   PointsVector pv = ((*trajs)[idx])->getPoints();
-  QPen* pen = new QPen(QColor(0,255,0, 100), 3);
-  ls->setPen(pen);
+  ls->setPen(penInactiveTraj);
 
   for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
     cout << "x, y: " << it_p->x() << ", " << it_p->y() << endl;
 
-    ls->addPoint(new CirclePoint(it_p->x(), it_p->y(), 10, QString(), Point::Middle, pen));
+    ls->addPoint(new CirclePoint(it_p->x(), it_p->y(), 10, QString(),
+                                 Point::Middle, penInactiveTraj));
   }
 
   geom.replace(idx, ls);
@@ -145,20 +146,17 @@ void Mapviewer::updateTraj(unsigned idx)
   mc->update();
 }
 
-void Mapviewer::deleteTraj(unsigned idx)
+void Mapviewer::deleteTraj(int idx)
 {
-   cout << "geom: idx = " << idx;
-
   if (trajlayer == NULL) return;
 
   QList<Geometry*> &geom = trajlayer->getGeometries();
   if (idx >= geom.size()) return;
 
-  cout << ", size = " << geom.size();
-
   geom.removeAt(idx);
 
-  cout << ", size = " << geom.size() << endl;
+  for(int i = 0; i < geom.size(); ++i)
+    geom[i]->setName(QString::number(i+1));
 
   mc->update();
 }
@@ -240,7 +238,29 @@ void Mapviewer::updateViewLabels(const QPointF &, int)
                       QString::number(mapadapter->adaptedZoom()));
 }
 
+void Mapviewer::onTrajClicked(Geometry* g, QPoint)
+{
+  int idx = g->name().toInt() - 1;
+  selectTraj(idx);
+  emit trajClicked(idx);
+}
 
+void Mapviewer::selectTraj(int idx)
+{
+  QList<Geometry*> &geom = trajlayer->getGeometries();
+  for(int i = 0; i < geom.size(); ++i)
+    geom[i]->setPen(penInactiveTraj);
+
+  if (idx < geom.size())
+    geom[idx]->setPen(penActiveTraj);
+
+  mc->update();
+}
+
+void Mapviewer::onMouseEventCoordinate(const QMouseEvent* e, const QPointF p)
+{
+  emit mouseEventCoordinate(e, p);
+}
 
 void Mapviewer::resizeEvent ( QResizeEvent * event )	
 {

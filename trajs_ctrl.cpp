@@ -37,6 +37,8 @@ TrajsCtrl::TrajsCtrl(QWidget *parent) :
   connect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
           this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 
+  connect(&tree_view, SIGNAL(clicked(QModelIndex)), SLOT(onTrajSelected(QModelIndex)));
+
   tree_view.setModel(trajs_model);
   tree_view.setWindowTitle(QObject::tr("Simple Tree Model"));
   tree_view.setItemDelegate(new DoubleSpinBoxDelegate);
@@ -46,6 +48,14 @@ TrajsCtrl::TrajsCtrl(QWidget *parent) :
   vLayout->addLayout(hLayout);
 
   setLayout(vLayout);
+}
+
+void TrajsCtrl::setMapViewer(Mapviewer * mv)
+{
+  map_viewer = mv;
+
+  connect(map_viewer, SIGNAL(trajClicked(int)), this, SLOT(onTrajClicked(int)));
+  connect(this, SIGNAL(trajSelected(int)), map_viewer, SLOT(selectTraj(int)));
 }
 
 void TrajsCtrl::beginAddTraj()
@@ -79,9 +89,10 @@ void TrajsCtrl::endAddTraj()
     QModelIndex index, child;
 
     unsigned tr_num = trajs_model->rowCount(root);
-
     if (!trajs_model->insertRow(tr_num, root))
       return;
+
+    linestring->setName(QString::number(tr_num + 1));
 
     index = trajs_model->index(tr_num, 0, root);
     trajs_model->setData(index, "Traj " + QString::number(tr_num + 1), Qt::EditRole);
@@ -120,11 +131,7 @@ void TrajsCtrl::deleteTraj()
 {
   QModelIndex index = tree_view.selectionModel()->currentIndex();
 
-  unsigned idx;
-  if (!index.parent().isValid())
-    idx = index.row();
-  else
-    idx = index.parent().row();
+  int idx = index.parent().isValid() ? index.parent().row() : index.row();
 
   cout << "TrajsCtrl::deleteTraj(), idx = " << idx << endl;
 
@@ -160,19 +167,38 @@ void TrajsCtrl::deleteTraj()
 
 void TrajsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
 {
-  cout << "Data Changed: " << tl.column() << ", " << tl.row() << endl;
+  int idx = tl.parent().isValid() ? tl.parent().row() : tl.row();
 
-  PointsVector pv = trajs[0]->getPoints();
+  cout << "TrajsCtrl::onDataChanged: idx = " << idx
+       << endl;
 
+  PointsVector pv = trajs[idx]->getPoints();
   if ((tl.row() >= pv.size()) || (tl.column() >= 2)) return;
 
   QPointF &p = pv[tl.row()];
   if (tl.column() == 0) p.setX(tl.data().toDouble());
   if (tl.column() == 1) p.setY(tl.data().toDouble());
 
-  trajs[0]->setPoints(pv);
+  trajs[idx]->setPoints(pv);
 
-  map_viewer->updateTraj(0);
+  map_viewer->updateTraj(idx);
+  map_viewer->selectTraj(idx);
+}
+
+void TrajsCtrl::onTrajClicked(int idx)
+{
+  QModelIndex index, root;
+  root = tree_view.rootIndex();
+  index = trajs_model->index(idx, 0, root);
+
+  tree_view.selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
+}
+
+void TrajsCtrl::onTrajSelected(QModelIndex index)
+{
+  int idx = index.parent().isValid() ? index.parent().row() : index.row();
+
+  map_viewer->selectTraj(idx);
 }
 
 void TrajsCtrl::addTrajPoint(const QMouseEvent* e, QPointF p)

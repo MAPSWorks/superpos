@@ -19,12 +19,13 @@ class TrajsCtrl: public QWidget
   public:
     explicit TrajsCtrl(QWidget *parent = 0);
 
-    void setMapViewer(Mapviewer * mv) {map_viewer = mv;}
+    void setMapViewer(Mapviewer * mv);
 
     Trajectories& getTrajs() { return trajs; }
 
   signals:
     void eventUpdate();
+    void trajSelected(int);
 
   public slots:
     void beginAddTraj();
@@ -34,6 +35,8 @@ class TrajsCtrl: public QWidget
 
     void addTrajPoint(const QMouseEvent*, QPointF);
     void onDataChanged(QModelIndex, QModelIndex, QVector<int>);
+    void onTrajClicked(int);
+    void onTrajSelected(QModelIndex);
 
   private:
     Trajectories trajs;
