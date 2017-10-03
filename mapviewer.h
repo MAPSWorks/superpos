@@ -48,6 +48,8 @@ public:
     void clearTrajLayer() { trajlayer->clearGeometries(); }
     void updateTrajLayer() { mc->update(); }
 
+    void addTarget(Point * t) { targlayer->addGeometry(t); }
+
     int getZoomLevel() { return mapadapter->adaptedZoom(); }
 
 public slots:

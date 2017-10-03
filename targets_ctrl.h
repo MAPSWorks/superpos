@@ -18,6 +18,7 @@ class TargetsCtrl : public QWidget
 
     Targets& getTargets() { return targets; }
 
+    void setMapViewer(Mapviewer * mv);
     void setTrajsCtrl(TrajsCtrl * t) {trajs_ctrl = t;}
 
   signals:
@@ -26,12 +27,14 @@ class TargetsCtrl : public QWidget
   public slots:
     void addTarget();
     void deleteTarget();
-    void updateWidget();
 
   private:
-    Targets    targets;
-    QTabWidget tab_wgt;
+    TreeModel *targs_model;
+    QTreeView  tree_view;
 
+    Targets    targets;
+
+    Mapviewer  *map_viewer;
     TrajsCtrl* trajs_ctrl;
 
     QPushButton pbAddTarg,

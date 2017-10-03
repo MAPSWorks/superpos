@@ -96,7 +96,7 @@ void Mapviewer::updateTargets(Targets* targets)
 
   for (Targets::iterator it = targets->begin(); it != targets->end(); ++it) {
     QPointF crd = it -> getCoords();
-    QPixmap pxm(10,10);
+    QPixmap pxm(16,16);
     pxm.fill(Qt::red);
     Point *targ = new Point(crd.x(), crd.y(), pxm);
     targlayer->addGeometry(targ);

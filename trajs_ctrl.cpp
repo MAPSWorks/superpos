@@ -14,39 +14,32 @@ TrajsCtrl::TrajsCtrl(QWidget *parent) :
 
   trajs.clear();
 
-  updateWidget();
-
   pbBeginAddTraj.setText("Задать точки");
   pbBeginAddTraj.setGeometry(0,0, 100, 20);
   pbEndAddTraj.setText("Добавить тр-ю");
   pbEndAddTraj.setGeometry(0,0, 100, 20);
+  pbEndAddTraj.setEnabled(false);
   pbDelTraj.setText("Удалить тр-ю");
   pbDelTraj.setGeometry(0,0, 100, 20);
-
-  pbEndAddTraj.setEnabled(false);
-
   connect(&pbBeginAddTraj, SIGNAL(released()), SLOT(beginAddTraj()));
   connect(&pbEndAddTraj,   SIGNAL(released()), SLOT(endAddTraj()));
   connect(&pbDelTraj,      SIGNAL(released()), SLOT(deleteTraj()));
 
-  QHBoxLayout * hLayout = new QHBoxLayout;
-  hLayout->addWidget(&pbBeginAddTraj);
-  hLayout->addWidget(&pbEndAddTraj);
-  hLayout->addWidget(&pbDelTraj);
-
+  connect(&tree_view, SIGNAL(clicked(QModelIndex)), SLOT(onTrajSelected(QModelIndex)));
   connect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
           this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
-
-  connect(&tree_view, SIGNAL(clicked(QModelIndex)), SLOT(onTrajSelected(QModelIndex)));
 
   tree_view.setModel(trajs_model);
   tree_view.setWindowTitle(QObject::tr("Simple Tree Model"));
   tree_view.setItemDelegate(new DoubleSpinBoxDelegate);
 
+  QHBoxLayout * hLayout = new QHBoxLayout;
+  hLayout->addWidget(&pbBeginAddTraj);
+  hLayout->addWidget(&pbEndAddTraj);
+  hLayout->addWidget(&pbDelTraj);
   QVBoxLayout * vLayout = new QVBoxLayout;
   vLayout->addWidget(&tree_view);
   vLayout->addLayout(hLayout);
-
   setLayout(vLayout);
 }
 
@@ -123,15 +116,13 @@ void TrajsCtrl::endAddTraj()
 
   connect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
           this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
-
-  updateWidget();
 }
 
 void TrajsCtrl::deleteTraj()
 {
   QModelIndex index = tree_view.selectionModel()->currentIndex();
-
   int idx = index.parent().isValid() ? index.parent().row() : index.row();
+  if (idx < 0) return;
 
   cout << "TrajsCtrl::deleteTraj(), idx = " << idx << endl;
 
@@ -160,7 +151,6 @@ void TrajsCtrl::deleteTraj()
                             "Траектория " + QString::number(idx+1)
                                           + " успешно удалена!");
 
-    updateWidget();
     emit eventUpdate();
   }
 }
@@ -213,25 +203,4 @@ void TrajsCtrl::addTrajPoint(const QMouseEvent* e, QPointF p)
 
     map_viewer->updateTrajLayer();
   }
-}
-
-void TrajsCtrl::updateWidget()
-{
-  int i = 0;
-  int cur = tab_wgt.currentIndex();
-  tab_wgt.clear();
-
-  for (Trajectories::iterator it = trajs.begin(); it != trajs.end(); ++it, ++i) {
-    PointsVector pv = (*it)->getPoints();
-    QListWidget *lw = new QListWidget;
-
-    for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
-      lw->addItem(QString::number(it_p->x()) + ", " + QString::number(it_p->y()));
-    }
-
-    tab_wgt.addTab(lw, "Тр." + QString::number(i+1));
-  }
-
-  if (cur <= i)
-    tab_wgt.setCurrentIndex(cur);
 }

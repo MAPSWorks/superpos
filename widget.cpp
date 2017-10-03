@@ -21,8 +21,8 @@ Widget::Widget():
   trajs_ctrl.setMapViewer(mv);
   mv->setTrajsContainer(&trajs_ctrl.getTrajs());
   targets_ctrl.setTrajsCtrl(&trajs_ctrl);
+  targets_ctrl.setMapViewer(mv);
 
-  connect(ui->pbUpdate, SIGNAL(released()), &locators_ctrl, SLOT(updateWidget()));
   connect(ui->pbUpdate, SIGNAL(released()), this, SLOT(updateLocators()));
   connect(ui->pbReset,  SIGNAL(released()), this, SLOT(optimizeView()));
   connect(&locators_ctrl, SIGNAL(eventUpdate()), this, SLOT(updateLocators()));

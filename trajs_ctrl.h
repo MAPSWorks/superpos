@@ -28,27 +28,32 @@ class TrajsCtrl: public QWidget
     void trajSelected(int);
 
   public slots:
+    /// Обработчики нажатия кнопок
     void beginAddTraj();
     void endAddTraj();
     void deleteTraj();
-    void updateWidget();
 
+    /// Обработчик "накалывания" точки новой траектории
     void addTrajPoint(const QMouseEvent*, QPointF);
+
+    /// Изменение данных в модели (программой или пользователем) (!!!)
     void onDataChanged(QModelIndex, QModelIndex, QVector<int>);
+
+    /// Обработчик "кликания" по траектории на карте
     void onTrajClicked(int);
+
+    /// Обработчик выбора траектории в tree_view
     void onTrajSelected(QModelIndex);
 
   private:
-    Trajectories trajs;
-    QTabWidget tab_wgt;
     TreeModel *trajs_model;
-    QTreeView tree_view;
+    QTreeView  tree_view;
 
+    Trajectories trajs;
     PointsVector points_vector;
 
-    Mapviewer *map_viewer;
-
-    LineString* linestring;
+    Mapviewer  *map_viewer;
+    LineString *linestring;
 
     QPushButton pbBeginAddTraj,
                 pbEndAddTraj,
