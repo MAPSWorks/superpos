@@ -38,7 +38,11 @@ class Widget : public QWidget
 
     void optimizeView();
 
+    void loadScenarioJSON();
+    void saveScenarioJSON();
+
     void startImit();
+    void pauseImit();
     void stopImit();
 
   private:

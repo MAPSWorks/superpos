@@ -19,6 +19,7 @@ class Target
     ~Target() {}
 
     void start();
+    void startLater(double);
 
     bool isExistingNow();
 
@@ -33,12 +34,15 @@ class Target
     void setStartTime(Time t) { startTime = t; }
     Time getStartTime() { return startTime; }
 
+    int getTrajID() { return traj->getID(); }
+
   private:
     double getTimeDelta();
 
     BaseTrajectory *traj;
 
     double vel, acc;
+    double delay;
 
     Time startTime;
 };

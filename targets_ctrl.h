@@ -21,6 +21,10 @@ class TargetsCtrl : public QWidget
     void setMapViewer(Mapviewer * mv);
     void setTrajsCtrl(TrajsCtrl * t) {trajs_ctrl = t;}
 
+    /// Загрузка и сохранение сценариев
+    void loadJSON(const QJsonObject &json);
+    void saveJSON(QJsonObject &json);
+
   signals:
     void eventUpdate();
 

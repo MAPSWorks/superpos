@@ -6,7 +6,7 @@
 using namespace std;
 
 BaseTrajectory::BaseTrajectory(PointsVector pv):
-  points(pv)
+  points(pv), id(-1)
 {
 }
 

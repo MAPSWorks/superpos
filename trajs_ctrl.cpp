@@ -4,12 +4,15 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QJsonObject>
+#include <QJsonArray>
+
 
 TrajsCtrl::TrajsCtrl(QWidget *parent) :
   QWidget(parent)
 {
   QStringList headers;
-  headers << tr("lat") << tr("lon");
+  headers << tr("key") << tr("value");
   trajs_model = new TreeModel(headers, QString());
 
   trajs.clear();
@@ -51,6 +54,41 @@ void TrajsCtrl::setMapViewer(Mapviewer * mv)
   connect(this, SIGNAL(trajSelected(int)), map_viewer, SLOT(selectTraj(int)));
 }
 
+void TrajsCtrl::loadJSON(const QJsonObject &json)
+{
+  QJsonArray trajArray = json["Trajs"].toArray();
+
+  cout << "There are " << trajArray.size() << " trajs." << endl;
+}
+
+void TrajsCtrl::saveJSON(QJsonObject &json) const
+{
+  QJsonArray trajArray;
+
+  int i(0);
+  for (Trajectories::const_iterator it = trajs.begin(); it != trajs.end(); it++) {
+    QJsonArray pointArray;
+    QJsonObject trajObject;
+    PointsVector pv = (*it)->getPoints();
+
+    int j(0);
+    for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p, ++j) {
+      QJsonObject pointObject;
+
+      pointObject.insert("x", it_p->x());
+      pointObject.insert("y", it_p->y());
+
+      pointArray.append(pointObject);
+    }
+    trajObject.insert("ID", (*it)->getID());
+    trajObject.insert("Points", pointArray);
+
+    trajArray.append(trajObject);
+  }
+
+  json["Trajs"] = trajArray;
+}
+
 void TrajsCtrl::beginAddTraj()
 {
   connect(map_viewer, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
@@ -71,11 +109,15 @@ void TrajsCtrl::beginAddTraj()
 
 void TrajsCtrl::endAddTraj()
 {
+  static int s_id(0);
   disconnect(map_viewer, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
           this, SLOT(addTrajPoint(const QMouseEvent*,QPointF)));
 
   if (!points_vector.empty()) {
     LinearTrajectory *t = new LinearTrajectory(points_vector);
+    t->setID(s_id);
+    s_id++;
+
     trajs.push_back(t);
 
     QModelIndex root = tree_view.rootIndex();

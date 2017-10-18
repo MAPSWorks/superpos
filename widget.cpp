@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <QToolBox>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace std;
 
@@ -32,7 +34,12 @@ Widget::Widget():
 
   // Управление имитацией
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
+  connect(ui->pbPauseImit, SIGNAL(released()), SLOT(pauseImit()));
   connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
+
+  // Управление сценариями (временно)
+  connect(ui->pbLoadScenario, SIGNAL(released()), SLOT(loadScenarioJSON()));
+  connect(ui->pbSaveScenario,  SIGNAL(released()), SLOT(saveScenarioJSON()));
 
   // Объединяем панели в ToolBox
   QToolBox *tb = new QToolBox(this);
@@ -76,6 +83,43 @@ void Widget::optimizeView()
   mv->resetView(&locators_ctrl.getLocators());
 }
 
+void Widget::loadScenarioJSON()
+{
+  QFile loadFile(QStringLiteral("scenario.json"));
+
+  if (!loadFile.open(QIODevice::ReadOnly)) {
+      qWarning("Couldn't open save file.");
+      return;
+  }
+
+  QByteArray data = loadFile.readAll();
+  QJsonDocument loadDoc(QJsonDocument::fromJson(data));
+  QJsonObject json = loadDoc.object();
+
+  //locators_ctrl.loadJSON(json);
+  trajs_ctrl.loadJSON(json);
+  targets_ctrl.loadJSON(json);
+}
+
+void Widget::saveScenarioJSON()
+{
+  QJsonObject json;
+
+  //locators_ctrl.saveJSON(json);
+  trajs_ctrl.saveJSON(json);
+  targets_ctrl.saveJSON(json);
+
+  QFile saveFile(QStringLiteral("scenario.json"));
+
+  if (!saveFile.open(QIODevice::WriteOnly)) {
+      qWarning("Couldn't open save file.");
+      return;
+  }
+  QJsonDocument saveDoc(json);
+  saveFile.write(saveDoc.toJson());
+  saveFile.close();
+}
+
 void Widget::startImit()
 {
   Targets& targets = targets_ctrl.getTargets();
@@ -95,6 +139,21 @@ void Widget::startImit()
     it->start();
     it->setOutFile(name.toStdString().c_str());
   }
+}
+
+void Widget::pauseImit()
+{
+  /*
+  if (timer.isActive()) {
+    timer.stop();
+  }
+  else {
+    timer.start();
+  }
+  */
+
+  saveScenarioJSON();
+  loadScenarioJSON();
 }
 
 void Widget::stopImit()

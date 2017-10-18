@@ -8,6 +8,8 @@
 #include <QPushButton>
 #include <QTreeView>
 
+class QJsonObject;
+
 #include "mapviewer.h"
 #include "trajs_model.h"
 #include "treemodel.h"
@@ -22,6 +24,10 @@ class TrajsCtrl: public QWidget
     void setMapViewer(Mapviewer * mv);
 
     Trajectories& getTrajs() { return trajs; }
+
+    /// Загрузка и сохранение сценариев
+    void loadJSON(const QJsonObject &json);
+    void saveJSON(QJsonObject &json) const;
 
   signals:
     void eventUpdate();

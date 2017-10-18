@@ -6,7 +6,7 @@
 using namespace std;
 
 Target::Target(BaseTrajectory *tr):
-  traj(tr), vel(0), acc(0)
+  traj(tr), vel(0), acc(0), delay(2)
 {
 
 }
@@ -16,9 +16,18 @@ void Target::start()
   startTime = chrono::system_clock::now();
 }
 
+void Target::startLater(double d)
+{
+  delay = d;
+  start();
+}
+
 bool Target::isExistingNow()
 {
-  return (chrono::system_clock::now() > startTime);
+  bool res = chrono::duration_cast<std::chrono::nanoseconds>
+               (std::chrono::system_clock::now()-startTime).count()
+               > delay;
+  return res;
 }
 
 double Target::getTimeDelta()
@@ -27,9 +36,9 @@ double Target::getTimeDelta()
   chrono::time_point<chrono::system_clock> cur = std::chrono::system_clock::now();
   double elaps_ns = chrono::duration_cast<std::chrono::nanoseconds>
                            (cur-startTime).count();
-  t = elaps_ns * 1e-9;
+  t = elaps_ns * 1e-9 - delay;
 
-  if (t > 10e6)
+  if ((t > 10e6) || (t < 0))
     t = 0;
 
   return t;

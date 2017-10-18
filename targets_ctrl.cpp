@@ -2,6 +2,8 @@
 #include "dialog.h"
 
 #include <QGridLayout>
+#include <QJsonObject>
+#include <QJsonArray>
 
 TargetsCtrl::TargetsCtrl(QWidget *parent) : QWidget(parent)
 {
@@ -30,6 +32,31 @@ TargetsCtrl::TargetsCtrl(QWidget *parent) : QWidget(parent)
   vLayout->addWidget(&tree_view);
   vLayout->addLayout(hLayout);
   setLayout(vLayout);
+}
+
+void TargetsCtrl::loadJSON(const QJsonObject &json)
+{
+  QJsonArray targArray = json["Targets"].toArray();
+
+  cout << "There are " << targArray.size() << " targets." << endl;
+}
+
+void TargetsCtrl::saveJSON(QJsonObject &json)
+{
+  QJsonArray targArray;
+
+  int i(0);
+  for (Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+    QJsonObject targObject;
+
+    targObject.insert("traj", it->getTrajID());
+    targObject.insert("vel",  it->getVel());
+    targObject.insert("acc",  it->getAcc());
+
+    targArray.append(targObject);
+  }
+
+  json["Targets"] = targArray;
 }
 
 void TargetsCtrl::addTarget()

@@ -2,6 +2,8 @@
 #include "dialog.h"
 
 #include <QGridLayout>
+#include <QJsonObject>
+#include <QJsonArray>
 
 LocatorsCtrl::LocatorsCtrl()
 {
@@ -9,7 +11,9 @@ LocatorsCtrl::LocatorsCtrl()
 
   locators.push_back(Locator());
   locators.back().init(QPointF(COORDS(34.0, 59.0, 44.07), COORDS(56.0,  8.0, 49.83)),
-             "/DATA/work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 501); // 44 град
+   //          "/DATA/work/IANS/polinom/Эксперименты_10_6хРЛС/2_250316/RLS_1_fileRLS_FFT_001.b", 501); // 44 град
+            "/home/byldin/work/polinom/Эксперименты 18.12.16/RLS_3_fileRLS_FFT_001.b", 501); // 44 град
+
 
   updateWidget();
 

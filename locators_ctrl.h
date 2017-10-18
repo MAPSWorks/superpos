@@ -17,6 +17,10 @@ class LocatorsCtrl: public QWidget
   public:
     LocatorsCtrl();
 
+    /// Загрузка и сохранение сценариев
+    void loadJSON(const QJsonObject &json);
+    void saveJSON(QJsonObject &json) const;
+
     Locators& getLocators() { return locators; }
 
     QPointF getCenter();

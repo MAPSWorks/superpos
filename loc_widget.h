@@ -36,7 +36,6 @@ class LocWidget : public QWidget
 
     void     setFilename(const char*);
     void     setCoords(QPointF&);
-    void     setStartTime(QPointF&);
 
   signals:
 
