@@ -52,6 +52,8 @@ class TrajsCtrl: public QWidget
     void onTrajSelected(QModelIndex);
 
   private:
+    void addTraj(int id, BaseTrajectory* t);
+
     TreeModel *trajs_model;
     QTreeView  tree_view;
 

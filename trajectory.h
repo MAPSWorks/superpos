@@ -2,6 +2,7 @@
 #define TRAJECTORY_H
 
 #include <vector>
+#include <map>
 
 #include <QPointF>
 
@@ -33,6 +34,6 @@ class LinearTrajectory : public BaseTrajectory
     QPointF getCoords(double t, double v, double a);
 };
 
-typedef std::vector<BaseTrajectory*> Trajectories;
+typedef std::map<int, BaseTrajectory*> Trajectories;
 
 #endif // TRAJECTORY_H

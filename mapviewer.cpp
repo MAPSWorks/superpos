@@ -112,7 +112,7 @@ void Mapviewer::updateTrajs()
   for (Trajectories::iterator it = trajs->begin(); it != trajs->end(); ++it) {
     LineString * ls = new LineString();
     ls->setPen(penInactiveTraj);
-    PointsVector pv = (*it)->getPoints();
+    PointsVector pv = (*it).second->getPoints();
     for (PointsVector::iterator it_p = pv.begin(); it_p != pv.end(); ++it_p) {
       ls->addPoint(new CirclePoint(it_p->x(), it_p->y(), 10, QString(),
                                    Point::Middle, penInactiveTraj));

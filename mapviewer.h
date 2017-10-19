@@ -73,7 +73,7 @@ private:
     QLabel* zoomlabel;
     QPixmap pixmap_azim;
 
-    Trajectories* trajs;
+    Trajectories *trajs;
 
     QPen * penActiveTraj,
          * penInactiveTraj;
