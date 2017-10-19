@@ -55,6 +55,7 @@ public:
 public slots:
     void updateTraj(int);
     void deleteTraj(int);
+    void deleteAllTrajs();
     void updateTrajs();
     void selectTraj(int);
 

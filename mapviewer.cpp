@@ -161,6 +161,14 @@ void Mapviewer::deleteTraj(int idx)
   mc->update();
 }
 
+void Mapviewer::deleteAllTrajs()
+{
+  if (trajlayer == NULL) return;
+
+  trajlayer->clearGeometries();
+  mc->update();
+}
+
 void Mapviewer::updatePixmapAzim(int L, int phi)
 {
   pixmap_azim = QPixmap(2*L, 2*L);

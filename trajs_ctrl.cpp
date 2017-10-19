@@ -59,12 +59,13 @@ void TrajsCtrl::loadJSON(const QJsonObject &json)
   disconnect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
           this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 
+  deleteAllTrajs();
+
   QPen* pen = new QPen(QColor(0,255,0, 100), 3);
   QJsonArray trajArray = json["Trajs"].toArray();
 
   for (int i = 0; i < trajArray.size(); ++i) {
     linestring = new LineString(QList<Point*>(), QString(), pen);
-    map_viewer->addTraj(linestring);
 
     QJsonObject trajObject = trajArray[i].toObject();
     int id = trajObject["ID"].toInt();
@@ -78,9 +79,10 @@ void TrajsCtrl::loadJSON(const QJsonObject &json)
       pv.push_back(p);
     }
 
-      LinearTrajectory *t = new LinearTrajectory(pv);
-      t->setID(id);
-      addTraj(id, t);
+    LinearTrajectory *t = new LinearTrajectory(pv);
+    t->setID(id);
+    addTraj(t);
+    map_viewer->addTraj(linestring);
   }
   map_viewer->updateTrajLayer();
   QMessageBox::information(0, "Добавление траектории", "Траектории успешно добавлены!");
@@ -137,16 +139,18 @@ void TrajsCtrl::beginAddTraj()
 
 void TrajsCtrl::endAddTraj()
 {
-  static int s_id(0);
   disconnect(map_viewer, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
           this, SLOT(addTrajPoint(const QMouseEvent*,QPointF)));
 
   if (!points_vector.empty()) {
     LinearTrajectory *t = new LinearTrajectory(points_vector);
 
-    t->setID(s_id);
-    addTraj(s_id, t);
-    s_id++;
+    QModelIndex root = tree_view.rootIndex();
+    QModelIndex index, child;
+
+    unsigned tr_num = trajs_model->rowCount(root);
+
+    addTraj(t);
 
     QMessageBox::information(0, "Добавление траектории", "Траектория успешно добавлена!");
   }
@@ -162,9 +166,14 @@ void TrajsCtrl::endAddTraj()
           this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 }
 
-void TrajsCtrl::addTraj(int id, BaseTrajectory* t)
+void TrajsCtrl::addTraj(BaseTrajectory* t)
 {
-  trajs.insert(std::pair<int, BaseTrajectory*>(id, t));
+  static int s_id(0);
+  t->setID(s_id);
+  trajs.insert(std::pair<int, BaseTrajectory*>(s_id, t));
+  s_id++;
+
+  cout << "addTraj, id " << s_id << endl;
 
   QModelIndex root = tree_view.rootIndex();
   QModelIndex index, child;
@@ -179,17 +188,13 @@ void TrajsCtrl::addTraj(int id, BaseTrajectory* t)
   trajs_model->setData(index, "Traj " + QString::number(tr_num + 1), Qt::EditRole);
 
   int i = 0;
-  for (PointsVector::iterator it = points_vector.begin();
-                              it != points_vector.end(); ++it, ++i) {
-
-      trajs_model->insertRow(i, index);
-
-      cout << "endAddTraj: x,y: " << it->x() << " " << it->y() << endl;
-
-      child = trajs_model->index(i, 0, index);
-      trajs_model->setData(child, QVariant(it->x()), Qt::EditRole);
-      child = trajs_model->index(i, 1, index);
-      trajs_model->setData(child, QVariant(it->y()), Qt::EditRole);
+  const PointsVector &pv = t->getPoints();
+  for (PointsVector::const_iterator it = pv.begin(); it != pv.end(); ++it, ++i) {
+    trajs_model->insertRow(i, index);
+    child = trajs_model->index(i, 0, index);
+    trajs_model->setData(child, QVariant(it->x()), Qt::EditRole);
+    child = trajs_model->index(i, 1, index);
+    trajs_model->setData(child, QVariant(it->y()), Qt::EditRole);
   }
 }
 
@@ -199,7 +204,9 @@ void TrajsCtrl::deleteTraj()
   int idx = index.parent().isValid() ? index.parent().row() : index.row();
   if (idx < 0) return;
 
-  cout << "TrajsCtrl::deleteTraj(), idx = " << idx << endl;
+  cout << "TrajsCtrl::deleteTraj(), trajs.size() = " << trajs.size()
+       << ", delete traj idx = " << idx
+       <<  endl;
 
   if (idx < trajs.size()) {
     disconnect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
@@ -228,6 +235,15 @@ void TrajsCtrl::deleteTraj()
 
     emit eventUpdate();
   }
+}
+
+void TrajsCtrl::deleteAllTrajs() {
+  QModelIndex root = tree_view.rootIndex();
+  unsigned tr_num = trajs_model->rowCount(root);
+
+  trajs_model->removeRows(0, tr_num, root);
+  trajs.clear();
+  map_viewer->deleteAllTrajs();
 }
 
 void TrajsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
