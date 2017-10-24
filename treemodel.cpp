@@ -28,7 +28,6 @@ void DoubleSpinBoxDelegate::setEditorData(QWidget *editor,
                                     const QModelIndex &index) const
 {
     double value = index.model()->data(index, Qt::EditRole).toDouble();
-
     QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
     spinBox->setValue(value);
 }
@@ -79,9 +78,6 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
 
     TreeItem *item = getItem(index);
 
-    if (item->parent() != rootItem)
-      return item->data(index.column()).toDouble();
-
     return item->data(index.column());
 }
 
@@ -89,6 +85,8 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return 0;
+
+    if (index.column() == 0) return QAbstractItemModel::flags(index);
 
     return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
 }

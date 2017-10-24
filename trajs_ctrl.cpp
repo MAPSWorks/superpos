@@ -12,7 +12,7 @@ TrajsCtrl::TrajsCtrl(QWidget *parent) :
   QWidget(parent)
 {
   QStringList headers;
-  headers << tr("key") << tr("value");
+  headers << tr("Ключ") << tr("Значение");
   trajs_model = new TreeModel(headers, QString());
 
   trajs.clear();
@@ -176,7 +176,7 @@ void TrajsCtrl::addTraj(BaseTrajectory* t)
   cout << "addTraj, id " << s_id << endl;
 
   QModelIndex root = tree_view.rootIndex();
-  QModelIndex index, child;
+  QModelIndex index_tr, index_p, index_xy;
 
   unsigned tr_num = trajs_model->rowCount(root);
   if (!trajs_model->insertRow(tr_num, root))
@@ -184,24 +184,37 @@ void TrajsCtrl::addTraj(BaseTrajectory* t)
 
   linestring->setName(QString::number(tr_num + 1));
 
-  index = trajs_model->index(tr_num, 0, root);
-  trajs_model->setData(index, "Traj " + QString::number(tr_num + 1), Qt::EditRole);
+  index_tr = trajs_model->index(tr_num, 0, root);
+  trajs_model->setData(index_tr, "Traj " + QString::number(tr_num + 1), Qt::EditRole);
 
   int i = 0;
   const PointsVector &pv = t->getPoints();
   for (PointsVector::const_iterator it = pv.begin(); it != pv.end(); ++it, ++i) {
-    trajs_model->insertRow(i, index);
-    child = trajs_model->index(i, 0, index);
-    trajs_model->setData(child, QVariant(it->x()), Qt::EditRole);
-    child = trajs_model->index(i, 1, index);
-    trajs_model->setData(child, QVariant(it->y()), Qt::EditRole);
+    trajs_model->insertRow(i, index_tr);
+    index_p = trajs_model->index(i, 0, index_tr);
+    trajs_model->setData(index_p, "Point " + QString::number(i+1), Qt::EditRole);
+
+    trajs_model->insertRow(0, index_p);
+    trajs_model->insertRow(1, index_p);
+
+    index_xy = trajs_model->index(0, 0, index_p);
+    trajs_model->setData(index_xy, "x", Qt::EditRole);
+    index_xy = trajs_model->index(1, 0, index_p);
+    trajs_model->setData(index_xy, "y", Qt::EditRole);
+
+    index_xy = trajs_model->index(0, 1, index_p);
+    trajs_model->setData(index_xy, QVariant(it->x()), Qt::EditRole);
+    index_xy = trajs_model->index(1, 1, index_p);
+    trajs_model->setData(index_xy, QVariant(it->y()), Qt::EditRole);
   }
 }
 
 void TrajsCtrl::deleteTraj()
 {
   QModelIndex index = tree_view.selectionModel()->currentIndex();
-  int idx = index.parent().isValid() ? index.parent().row() : index.row();
+  QModelIndex index_main = index;
+  while(index_main.parent().isValid()) index_main = index_main.parent();
+  int idx = index_main.row();
   if (idx < 0) return;
 
   cout << "TrajsCtrl::deleteTraj(), trajs.size() = " << trajs.size()
@@ -248,7 +261,9 @@ void TrajsCtrl::deleteAllTrajs() {
 
 void TrajsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
 {
-  int idx = tl.parent().isValid() ? tl.parent().row() : tl.row();
+  QModelIndex index_main = tl;
+  while(index_main.parent().isValid()) index_main = index_main.parent();
+  int idx = index_main.row();
 
   cout << "TrajsCtrl::onDataChanged: idx = " << idx
        << endl;
@@ -277,7 +292,9 @@ void TrajsCtrl::onTrajClicked(int idx)
 
 void TrajsCtrl::onTrajSelected(QModelIndex index)
 {
-  int idx = index.parent().isValid() ? index.parent().row() : index.row();
+  QModelIndex index_main = index;
+  while(index_main.parent().isValid()) index_main = index_main.parent();
+  int idx = index_main.row();
 
   map_viewer->selectTraj(idx);
 }

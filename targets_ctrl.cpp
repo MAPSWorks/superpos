@@ -8,7 +8,7 @@
 TargetsCtrl::TargetsCtrl(QWidget *parent) : QWidget(parent)
 {
   QStringList headers;
-  headers << tr("lat") << tr("lon") << tr("delay");
+  headers << tr("Ключ") << tr("Значение");
   targs_model = new TreeModel(headers, QString());
 
   targets.clear();
@@ -71,7 +71,7 @@ void TargetsCtrl::addTarget()
   TargetDialog* pDialog = new TargetDialog(trajs.size());
   if (pDialog->exec() == QDialog::Accepted) {
     bool ok1, ok2;
-    unsigned traj_num = pDialog->traj_num() - 1;
+    unsigned traj_idx = pDialog->traj_num() - 1;
     double vel = pDialog->velocity().toDouble(&ok1);
     double acc = pDialog->accel().toDouble(&ok2);
 
@@ -81,31 +81,44 @@ void TargetsCtrl::addTarget()
     }
 
     Trajectories trajs = trajs_ctrl->getTrajs();
-    if (trajs.size() <= traj_num) return;
+    if (trajs.size() <= traj_idx) return;
 
-    Target targ(trajs[traj_num]);
+    Target targ(trajs[traj_idx]);
     targ.setVel(vel);
     targ.setAcc(acc);
     targets.push_back(targ);
 
     QModelIndex root = tree_view.rootIndex();
-    QModelIndex index, child;
+    QModelIndex index_targ, index_prm;;
 
     unsigned targ_num = targs_model->rowCount(root);
     if (!targs_model->insertRow(targ_num, root))
       return;
 
-    index = targs_model->index(targ_num, 0, root);
-    targs_model->setData(index, "Target " + QString::number(targ_num + 1), Qt::EditRole);
-    targs_model->insertRow(0, index);
+    index_targ = targs_model->index(targ_num, 0, root);
+    targs_model->setData(index_targ, "Target " + QString::number(targ_num + 1), Qt::EditRole);
+    targs_model->insertRow(0, index_targ);
 
     QPointF c = targ.getCoords();
     cout << "addTarget: x,y: " << c.x() << " " << c.y() << endl;
 
-    child = targs_model->index(0, 0, index);
-    targs_model->setData(child, QVariant(c.x()), Qt::EditRole);
-    child = targs_model->index(0, 1, index);
-    targs_model->setData(child, QVariant(c.y()), Qt::EditRole);
+    targs_model->insertRow(0, index_targ);
+    index_prm = targs_model->index(0, 0, index_targ);
+    targs_model->setData(index_prm, "Traj idx", Qt::EditRole);
+    index_prm = targs_model->index(0, 1, index_targ);
+    targs_model->setData(index_prm, traj_idx, Qt::EditRole);
+
+    targs_model->insertRow(1, index_targ);
+    index_prm = targs_model->index(1, 0, index_targ);
+    targs_model->setData(index_prm, "Vel", Qt::EditRole);
+    index_prm = targs_model->index(1, 1, index_targ);
+    targs_model->setData(index_prm, vel, Qt::EditRole);
+
+    targs_model->insertRow(2, index_targ);
+    index_prm = targs_model->index(2, 0, index_targ);
+    targs_model->setData(index_prm, "Acc", Qt::EditRole);
+    index_prm = targs_model->index(2, 1, index_targ);
+    targs_model->setData(index_prm, acc, Qt::EditRole);
 
     map_viewer->updateTargets(&targets);
 
