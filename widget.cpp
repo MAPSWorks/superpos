@@ -151,9 +151,6 @@ void Widget::pauseImit()
     timer.start();
   }
   */
-
-  saveScenarioJSON();
-  loadScenarioJSON();
 }
 
 void Widget::stopImit()

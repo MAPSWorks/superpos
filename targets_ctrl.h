@@ -33,6 +33,9 @@ class TargetsCtrl : public QWidget
     void deleteTarget();
 
   private:
+    void addTarg(Target);
+    void deleteAllTargets();
+
     TreeModel *targs_model;
     QTreeView  tree_view;
 

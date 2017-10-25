@@ -101,6 +101,7 @@ void Mapviewer::updateTargets(Targets* targets)
     Point *targ = new Point(crd.x(), crd.y(), pxm);
     targlayer->addGeometry(targ);
   }
+  mc->update();
 }
 
 void Mapviewer::updateTrajs()

@@ -36,22 +36,47 @@ TargetsCtrl::TargetsCtrl(QWidget *parent) : QWidget(parent)
 
 void TargetsCtrl::loadJSON(const QJsonObject &json)
 {
+  disconnect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+          this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
+
+  deleteAllTargets();
+
   QJsonArray targArray = json["Targets"].toArray();
 
-  cout << "There are " << targArray.size() << " targets." << endl;
+  for (int i = 0; i < targArray.size(); ++i) {
+    QJsonObject targObject = targArray[i].toObject();
+
+
+    //QJsonArray pointArray = trajObject["Points"].toArray();
+    //PointsVector pv;
+
+    Trajectories trajs = trajs_ctrl->getTrajs();
+    Target t(trajs.at(targObject["Traj ID"].toInt()));
+    double start_time = targObject["Start"].toDouble();
+    //t.setStartTime(start_time);
+    t.setVel(targObject["Vel"].toDouble());
+    t.setAcc(targObject["Acc"].toDouble());
+
+    addTarg(t);
+  }
+  map_viewer->updateTargets(&targets);
+
+  connect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+          this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
+
+  QMessageBox::information(0, "Добавление целей", "Цели успешно добавлены!");
 }
 
 void TargetsCtrl::saveJSON(QJsonObject &json)
 {
   QJsonArray targArray;
 
-  int i(0);
   for (Targets::iterator it = targets.begin(); it != targets.end(); it++) {
     QJsonObject targObject;
 
-    targObject.insert("traj", it->getTrajID());
-    targObject.insert("vel",  it->getVel());
-    targObject.insert("acc",  it->getAcc());
+    targObject.insert("Traj ID", it->getTrajID());
+    targObject.insert("Vel",  it->getVel());
+    targObject.insert("Acc",  it->getAcc());
 
     targArray.append(targObject);
   }
@@ -86,41 +111,8 @@ void TargetsCtrl::addTarget()
     Target targ(trajs[traj_idx]);
     targ.setVel(vel);
     targ.setAcc(acc);
-    targets.push_back(targ);
 
-    QModelIndex root = tree_view.rootIndex();
-    QModelIndex index_targ, index_prm;;
-
-    unsigned targ_num = targs_model->rowCount(root);
-    if (!targs_model->insertRow(targ_num, root))
-      return;
-
-    index_targ = targs_model->index(targ_num, 0, root);
-    targs_model->setData(index_targ, "Target " + QString::number(targ_num + 1), Qt::EditRole);
-    targs_model->insertRow(0, index_targ);
-
-    QPointF c = targ.getCoords();
-    cout << "addTarget: x,y: " << c.x() << " " << c.y() << endl;
-
-    targs_model->insertRow(0, index_targ);
-    index_prm = targs_model->index(0, 0, index_targ);
-    targs_model->setData(index_prm, "Traj idx", Qt::EditRole);
-    index_prm = targs_model->index(0, 1, index_targ);
-    targs_model->setData(index_prm, traj_idx, Qt::EditRole);
-
-    targs_model->insertRow(1, index_targ);
-    index_prm = targs_model->index(1, 0, index_targ);
-    targs_model->setData(index_prm, "Vel", Qt::EditRole);
-    index_prm = targs_model->index(1, 1, index_targ);
-    targs_model->setData(index_prm, vel, Qt::EditRole);
-
-    targs_model->insertRow(2, index_targ);
-    index_prm = targs_model->index(2, 0, index_targ);
-    targs_model->setData(index_prm, "Acc", Qt::EditRole);
-    index_prm = targs_model->index(2, 1, index_targ);
-    targs_model->setData(index_prm, acc, Qt::EditRole);
-
-    map_viewer->updateTargets(&targets);
+    addTarg(targ);
 
     emit eventUpdate();
 
@@ -128,6 +120,45 @@ void TargetsCtrl::addTarget()
   }
   delete pDialog;
 }
+
+void TargetsCtrl::addTarg(Target targ)
+{
+  targets.push_back(targ);
+
+  QModelIndex root = tree_view.rootIndex();
+  QModelIndex index_targ, index_prm;;
+
+  unsigned targ_num = targs_model->rowCount(root);
+  if (!targs_model->insertRow(targ_num, root))
+    return;
+
+  index_targ = targs_model->index(targ_num, 0, root);
+  targs_model->setData(index_targ, "Target " + QString::number(targ_num + 1), Qt::EditRole);
+
+  QPointF c = targ.getCoords();
+  cout << "addTarget: x,y: " << c.x() << " " << c.y() << endl;
+
+  targs_model->insertRow(0, index_targ);
+  index_prm = targs_model->index(0, 0, index_targ);
+  targs_model->setData(index_prm, "Traj idx", Qt::EditRole);
+  index_prm = targs_model->index(0, 1, index_targ);
+  targs_model->setData(index_prm, targ.getTrajID(), Qt::EditRole);
+
+  targs_model->insertRow(1, index_targ);
+  index_prm = targs_model->index(1, 0, index_targ);
+  targs_model->setData(index_prm, "Vel", Qt::EditRole);
+  index_prm = targs_model->index(1, 1, index_targ);
+  targs_model->setData(index_prm, targ.getVel(), Qt::EditRole);
+
+  targs_model->insertRow(2, index_targ);
+  index_prm = targs_model->index(2, 0, index_targ);
+  targs_model->setData(index_prm, "Acc", Qt::EditRole);
+  index_prm = targs_model->index(2, 1, index_targ);
+  targs_model->setData(index_prm, targ.getAcc(), Qt::EditRole);
+
+  map_viewer->updateTargets(&targets);
+}
+
 
 void TargetsCtrl::deleteTarget()
 {
@@ -138,9 +169,9 @@ void TargetsCtrl::deleteTarget()
   cout << "TrajsCtrl::deleteTraj(), idx = " << idx << endl;
 
   if (idx < targets.size()) {
-    /*disconnect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+    disconnect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
                this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
-*/
+
     Targets::iterator it = targets.begin();
     for (unsigned i = 0; i < idx; ++i) it++;
     targets.erase(it);
@@ -152,19 +183,27 @@ void TargetsCtrl::deleteTarget()
       QModelIndex index = targs_model->index(i, 0, root);
       targs_model->setData(index, "Target " + QString::number(i + 1), Qt::EditRole);
     }
-
     map_viewer->updateTargets(&targets);
-    // map_viewer->deleteTraj(idx);
 
-  /*  connect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+    connect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
             this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
-*/
-    QMessageBox::information(0, "Удаление траектории",
-                            "Траектория " + QString::number(idx+1)
-                                          + " успешно удалена!");
+
+    QMessageBox::information(0, "Удаление цели",
+                      "Цель " + QString::number(idx+1) + " успешно удалена!");
   }
 
   emit eventUpdate();
+}
+
+void TargetsCtrl::deleteAllTargets()
+{
+  QModelIndex root = tree_view.rootIndex();
+  unsigned targ_num = targs_model->rowCount(root);
+  targs_model->removeRows(0, targ_num, root);
+
+  targets.clear();
+
+  map_viewer->updateTargets(&targets);
 }
 
 void TargetsCtrl::setMapViewer(Mapviewer * mv)

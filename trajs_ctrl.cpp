@@ -80,7 +80,6 @@ void TrajsCtrl::loadJSON(const QJsonObject &json)
     }
 
     LinearTrajectory *t = new LinearTrajectory(pv);
-    t->setID(id);
     addTraj(t);
     map_viewer->addTraj(linestring);
   }
@@ -145,11 +144,6 @@ void TrajsCtrl::endAddTraj()
   if (!points_vector.empty()) {
     LinearTrajectory *t = new LinearTrajectory(points_vector);
 
-    QModelIndex root = tree_view.rootIndex();
-    QModelIndex index, child;
-
-    unsigned tr_num = trajs_model->rowCount(root);
-
     addTraj(t);
 
     QMessageBox::information(0, "Добавление траектории", "Траектория успешно добавлена!");
@@ -168,17 +162,14 @@ void TrajsCtrl::endAddTraj()
 
 void TrajsCtrl::addTraj(BaseTrajectory* t)
 {
-  static int s_id(0);
-  t->setID(s_id);
-  trajs.insert(std::pair<int, BaseTrajectory*>(s_id, t));
-  s_id++;
-
-  cout << "addTraj, id " << s_id << endl;
-
   QModelIndex root = tree_view.rootIndex();
+  unsigned tr_num = trajs_model->rowCount(root);
+
+  t->setID(tr_num);
+  trajs.insert(std::pair<int, BaseTrajectory*>(t->getID(), t));
+
   QModelIndex index_tr, index_p, index_xy;
 
-  unsigned tr_num = trajs_model->rowCount(root);
   if (!trajs_model->insertRow(tr_num, root))
     return;
 
@@ -188,11 +179,16 @@ void TrajsCtrl::addTraj(BaseTrajectory* t)
   trajs_model->setData(index_tr, "Traj " + QString::number(tr_num + 1), Qt::EditRole);
 
   int i = 0;
+  trajs_model->insertRow(i, index_tr);
+  index_p = trajs_model->index(i, 0, index_tr);
+  trajs_model->setData(index_p, "ID = " + QString::number(t->getID()), Qt::EditRole);
+  i++;
+
   const PointsVector &pv = t->getPoints();
   for (PointsVector::const_iterator it = pv.begin(); it != pv.end(); ++it, ++i) {
     trajs_model->insertRow(i, index_tr);
     index_p = trajs_model->index(i, 0, index_tr);
-    trajs_model->setData(index_p, "Point " + QString::number(i+1), Qt::EditRole);
+    trajs_model->setData(index_p, "Point " + QString::number(i), Qt::EditRole);
 
     trajs_model->insertRow(0, index_p);
     trajs_model->insertRow(1, index_p);
@@ -232,10 +228,14 @@ void TrajsCtrl::deleteTraj()
     QModelIndex root = tree_view.rootIndex();
     trajs_model->removeRow(idx, root);
     unsigned tr_num = trajs_model->rowCount(root);
+
     for (unsigned i = 0; i < tr_num; ++i) {
       QModelIndex index = trajs_model->index(i, 0, root);
       trajs_model->setData(index, "Traj " + QString::number(i + 1), Qt::EditRole);
     }
+    int i(0);
+    for (Trajectories::iterator it = trajs.begin(); it != trajs.end(); it++, i++)
+      (*it).second->setID(i);
 
     map_viewer->deleteTraj(idx);
 
@@ -261,24 +261,24 @@ void TrajsCtrl::deleteAllTrajs() {
 
 void TrajsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
 {
-  QModelIndex index_main = tl;
-  while(index_main.parent().isValid()) index_main = index_main.parent();
-  int idx = index_main.row();
+  QModelIndex index_p = tl.parent(),
+              index_t = index_p.parent();
 
-  cout << "TrajsCtrl::onDataChanged: idx = " << idx
-       << endl;
+  int i_t = index_t.row(),
+      i_p = index_p.row() - 1; // потому что первое поле - ID
 
-  PointsVector pv = trajs[idx]->getPoints();
-  if ((tl.row() >= pv.size()) || (tl.column() >= 2)) return;
+  cout << "TrajsCtrl::onDataChanged: idx = " << i_t << ", " << i_p << endl;
 
-  QPointF &p = pv[tl.row()];
-  if (tl.column() == 0) p.setX(tl.data().toDouble());
-  if (tl.column() == 1) p.setY(tl.data().toDouble());
+  PointsVector pv = trajs[i_t]->getPoints();
+  QPointF &p = pv[i_p];
 
-  trajs[idx]->setPoints(pv);
+  if (tl.row() == 0) p.setX(tl.data().toDouble());
+  if (tl.row() == 1) p.setY(tl.data().toDouble());
 
-  map_viewer->updateTraj(idx);
-  map_viewer->selectTraj(idx);
+  trajs[i_t]->setPoints(pv);
+
+  map_viewer->updateTraj(i_t);
+  map_viewer->selectTraj(i_t);
 }
 
 void TrajsCtrl::onTrajClicked(int idx)
