@@ -32,6 +32,15 @@ class TargetsCtrl : public QWidget
     void addTarget();
     void deleteTarget();
 
+    /// Изменение данных в модели (программой или пользователем) (!!!)
+    void onDataChanged(QModelIndex, QModelIndex, QVector<int>);
+
+    /// Обработчик "кликания" по цели на карте
+    void onTargetClicked(int);
+
+    /// Обработчик выбора цели в tree_view
+    void onTargetSelected(QModelIndex);
+
   private:
     void addTarg(Target);
     void deleteAllTargets();

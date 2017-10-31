@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QRadioButton>
+#include <QToolBox>
 #include <QtMath>
 #include <list>
 
@@ -46,11 +47,14 @@ class Widget : public QWidget
     void stopImit();
 
   private:
+    void setAllEnabled(bool);
+
     Ui::Widget *ui;
     Mapviewer *mv;
 
     QTimer timer;
 
+    QToolBox * main_toolbox;
     ParamsGroupBox params;
     LocatorsCtrl   locators_ctrl;
     TrajsCtrl      trajs_ctrl;

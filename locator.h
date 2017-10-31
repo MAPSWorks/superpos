@@ -59,6 +59,8 @@ class Locator
     void     start();
     double   getPhi();
 
+    void     reset();
+
     LocWidget& getLocatorWidget()  {return loc_wgt;}
 
   private:

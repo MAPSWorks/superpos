@@ -58,10 +58,20 @@ public slots:
     void deleteAllTrajs();
     void updateTrajs();
     void selectTraj(int);
+    void selectTarget(int);
 
 signals:
     void mouseEventCoordinate(const QMouseEvent* e, const QPointF p);
     void trajClicked(int);
+    void targetClicked(int);
+
+protected slots:
+    void updateViewLabels(const QPointF&, int);
+    void onMouseEventCoordinate(const QMouseEvent*, const QPointF p);
+
+    void onTrajClicked(Geometry* g, QPoint);
+    void onTargetClicked(Geometry* g, QPoint);
+    void onUpdateRequest()  {std::cout << "onUpdateRequest" << std::endl;}
 
 private:
     MapControl* mc;
@@ -70,6 +80,7 @@ private:
     Layer* loclayer;
     Layer* targlayer;
     Layer* trajlayer;
+    Layer* azimlayer;
     Layer* notes;
     QLabel* zoomlabel;
     QPixmap pixmap_azim;
@@ -81,13 +92,6 @@ private:
 
     void addZoomButtons();
     void addZoomLabel();
-
-protected slots:
-    void updateViewLabels(const QPointF&, int);
-    void onMouseEventCoordinate(const QMouseEvent*, const QPointF p);
-
-    void onTrajClicked(Geometry* g, QPoint);
-    void onUpdateRequest()  {std::cout << "onUpdateRequest" << std::endl;}
 
 protected:
     virtual void resizeEvent(QResizeEvent * event);

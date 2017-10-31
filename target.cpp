@@ -6,7 +6,8 @@
 using namespace std;
 
 Target::Target(BaseTrajectory *tr):
-  traj(tr), vel(0), acc(0), delay(2)
+  traj(tr), vel(0), acc(0),
+  delay(0), isActive(false)
 {
 
 }
@@ -47,4 +48,10 @@ double Target::getTimeDelta()
 QPointF Target::getCoords()
 {
   return traj -> getCoords(getTimeDelta(), vel, acc);
+}
+
+void Target::reset()
+{
+
+  return;
 }

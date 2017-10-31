@@ -46,13 +46,10 @@ void TargetsCtrl::loadJSON(const QJsonObject &json)
   for (int i = 0; i < targArray.size(); ++i) {
     QJsonObject targObject = targArray[i].toObject();
 
-
-    //QJsonArray pointArray = trajObject["Points"].toArray();
-    //PointsVector pv;
-
     Trajectories trajs = trajs_ctrl->getTrajs();
     Target t(trajs.at(targObject["Traj ID"].toInt()));
     double start_time = targObject["Start"].toDouble();
+    t.setIsActive(true);
     //t.setStartTime(start_time);
     t.setVel(targObject["Vel"].toDouble());
     t.setAcc(targObject["Acc"].toDouble());
@@ -95,6 +92,9 @@ void TargetsCtrl::addTarget()
 
   TargetDialog* pDialog = new TargetDialog(trajs.size());
   if (pDialog->exec() == QDialog::Accepted) {
+    disconnect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+               this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
+
     bool ok1, ok2;
     unsigned traj_idx = pDialog->traj_num() - 1;
     double vel = pDialog->velocity().toDouble(&ok1);
@@ -115,6 +115,9 @@ void TargetsCtrl::addTarget()
     addTarg(targ);
 
     emit eventUpdate();
+
+    connect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+             this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 
     QMessageBox::information(0, "Добавление цели", "Цель успешно добавлена!");
   }
@@ -206,11 +209,48 @@ void TargetsCtrl::deleteAllTargets()
   map_viewer->updateTargets(&targets);
 }
 
+void TargetsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
+{
+  QModelIndex index_targ = tl.parent();
+
+  int i_targ = index_targ.row();
+
+  cout << __PRETTY_FUNCTION__ << ": idx = " << i_targ << endl;
+  cout << "row() = " << tl.row() << endl;
+
+  Target &t = targets[i_targ];
+
+  if (tl.row() == 1) t.setVel(tl.data().toDouble());
+  if (tl.row() == 2) t.setAcc(tl.data().toDouble());
+
+ // trajs[i_t]->setPoints(pv);
+
+  map_viewer->updateTargets(&targets);
+}
+
+void TargetsCtrl::onTargetClicked(int idx)
+{
+  QModelIndex index, root;
+  root = tree_view.rootIndex();
+  index = targs_model->index(idx, 0, root);
+  cout << __PRETTY_FUNCTION__ << ", idx = " << idx << endl;
+
+  tree_view.selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
+}
+
+void TargetsCtrl::onTargetSelected(QModelIndex index)
+{
+  QModelIndex index_main = index;
+  while(index_main.parent().isValid()) index_main = index_main.parent();
+  int idx = index_main.row();
+
+  map_viewer->selectTarget(idx);
+}
+
 void TargetsCtrl::setMapViewer(Mapviewer * mv)
 {
   map_viewer = mv;
 
- /* connect(map_viewer, SIGNAL(trajClicked(int)), this, SLOT(onTrajClicked(int)));
-  connect(this, SIGNAL(trajSelected(int)), map_viewer, SLOT(selectTraj(int)));
-  */
+  connect(map_viewer, SIGNAL(targetClicked(int)), this, SLOT(onTargetClicked(int)));
+  //connect(this, SIGNAL(targetSelected(int)), map_viewer, SLOT(selectTarget(int)));
 }

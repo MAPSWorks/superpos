@@ -31,7 +31,6 @@ class TrajsCtrl: public QWidget
 
   signals:
     void eventUpdate();
-    void trajSelected(int);
 
   public slots:
     /// Обработчики нажатия кнопок

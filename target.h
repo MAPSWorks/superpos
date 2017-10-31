@@ -34,7 +34,12 @@ class Target
     void setStartTime(Time t) { startTime = t; }
     Time getStartTime() { return startTime; }
 
+    void setIsActive(bool a) { isActive = a; }
+    bool getIsActive() { return isActive; }
+
     int getTrajID() { return traj->getID(); }
+
+    void reset();
 
   private:
     double getTimeDelta();
@@ -43,6 +48,8 @@ class Target
 
     double vel, acc;
     double delay;
+
+    bool   isActive;
 
     Time startTime;
 };

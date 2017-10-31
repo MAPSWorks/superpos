@@ -170,3 +170,9 @@ double Locator::getPhi()
   // TODO: Сделать нормально!
   return (int)(getAngle0() + 360.0 * getSpeed() * t) % 360;
 }
+
+void Locator::reset()
+{
+
+  return;
+}

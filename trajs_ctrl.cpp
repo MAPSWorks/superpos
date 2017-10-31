@@ -51,7 +51,7 @@ void TrajsCtrl::setMapViewer(Mapviewer * mv)
   map_viewer = mv;
 
   connect(map_viewer, SIGNAL(trajClicked(int)), this, SLOT(onTrajClicked(int)));
-  connect(this, SIGNAL(trajSelected(int)), map_viewer, SLOT(selectTraj(int)));
+  //connect(this, SIGNAL(trajSelected(int)), map_viewer, SLOT(selectTraj(int)));
 }
 
 void TrajsCtrl::loadJSON(const QJsonObject &json)
@@ -174,6 +174,7 @@ void TrajsCtrl::addTraj(BaseTrajectory* t)
     return;
 
   linestring->setName(QString::number(tr_num + 1));
+  linestring->setObjectName("Traj");
 
   index_tr = trajs_model->index(tr_num, 0, root);
   trajs_model->setData(index_tr, "Traj " + QString::number(tr_num + 1), Qt::EditRole);

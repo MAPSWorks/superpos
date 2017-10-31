@@ -35,7 +35,7 @@ Mapviewer::Mapviewer(QWidget *parent):
   mainlayer = new MapLayer("GoogleMapLayer", mapadapter);
   mc->addLayer(mainlayer);
 
-  penActiveTraj = new QPen(QColor(0,255,0, 150), 5);
+  penActiveTraj   = new QPen(QColor(0,255,0, 150), 5);
   penInactiveTraj = new QPen(QColor(0,255,0, 100), 3);
 
   addZoomButtons();
@@ -50,6 +50,9 @@ Mapviewer::Mapviewer(QWidget *parent):
   targlayer = new GeometryLayer("Targets", mapadapter);
   mc->addLayer(targlayer);
 
+  azimlayer = new GeometryLayer("Loc Azimuths", mapadapter);
+  mc->addLayer(azimlayer);
+
   mc->showScale(true);
 
   connect(mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
@@ -57,6 +60,9 @@ Mapviewer::Mapviewer(QWidget *parent):
 
   connect(trajlayer, SIGNAL(geometryClicked(Geometry*, QPoint)),
           this, SLOT(onTrajClicked(Geometry*, QPoint)));
+
+  connect(targlayer, SIGNAL(geometryClicked(Geometry*, QPoint)),
+          this, SLOT(onTargetClicked(Geometry*, QPoint)));
 }
 
 Mapviewer::~Mapviewer()
@@ -94,11 +100,19 @@ void Mapviewer::updateTargets(Targets* targets)
 
   targlayer->clearGeometries();
 
-  for (Targets::iterator it = targets->begin(); it != targets->end(); ++it) {
+  int i(0);
+  for (Targets::iterator it = targets->begin(); it != targets->end(); ++it, ++i) {
     QPointF crd = it -> getCoords();
-    QPixmap pxm(16,16);
-    pxm.fill(Qt::red);
+    QPixmap pxm(12,12);
+    if (it->getIsActive()) pxm.fill(Qt::red);
+    else pxm.fill(Qt::gray);
+
+   // cout << __PRETTY_FUNCTION__ << ", i = " << i << " " << crd.x() << " " << crd.y() << endl;
+
     Point *targ = new Point(crd.x(), crd.y(), pxm);
+
+    targ->setObjectName("Target");
+    targ->setName(QString::number(i+1));
     targlayer->addGeometry(targ);
   }
   mc->update();
@@ -185,6 +199,8 @@ void Mapviewer::updatePixmapAzim(int L, int phi)
 
 void Mapviewer::updateLocAzimuths(Locators* locators)
 {
+  if (azimlayer == NULL) return;
+  azimlayer->clearGeometries();
   for (Locators::iterator it = locators->begin(); it != locators->end(); ++it) {
     const QPointF cnt = it->getCenter();
     const double phi = it->getPhi();
@@ -195,7 +211,7 @@ void Mapviewer::updateLocAzimuths(Locators* locators)
                       pixmap_azim,
                       "azim");
 
-    targlayer->addGeometry(azim);
+    azimlayer->addGeometry(azim);
   }
 }
 
@@ -250,8 +266,17 @@ void Mapviewer::updateViewLabels(const QPointF &, int)
 void Mapviewer::onTrajClicked(Geometry* g, QPoint)
 {
   int idx = g->name().toInt() - 1;
+  cout << "onTrajClicked, " << g->objectName().toStdString() << endl;
   selectTraj(idx);
   emit trajClicked(idx);
+}
+
+void Mapviewer::onTargetClicked(Geometry* g, QPoint)
+{
+  int idx = g->name().toInt() - 1;
+  cout << "onTargetClicked, " << g->objectName().toStdString() << endl;
+  selectTarget(idx);
+  emit targetClicked(idx);
 }
 
 void Mapviewer::selectTraj(int idx)
@@ -262,6 +287,24 @@ void Mapviewer::selectTraj(int idx)
 
   if (idx < geom.size())
     geom[idx]->setPen(penActiveTraj);
+
+  mc->update();
+}
+
+void Mapviewer::selectTarget(int idx)
+{
+  QPixmap pxm(12,12);
+  pxm.fill(Qt::red);
+
+  QList<Geometry*> &geom = targlayer->getGeometries();
+  for(int i = 0; i < geom.size(); ++i) {
+    Point* p = (Point*)geom[i];;
+    p->setPixmap(pxm);
+  }
+  if (idx < geom.size()) {
+    Point* p = (Point*)geom[idx];;
+    p->setPixmap(pxm.scaled(16,16));
+  }
 
   mc->update();
 }

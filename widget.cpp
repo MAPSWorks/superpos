@@ -4,7 +4,6 @@
 #include "locator.h"
 
 #include <iostream>
-#include <QToolBox>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -42,16 +41,20 @@ Widget::Widget():
   connect(ui->pbSaveScenario,  SIGNAL(released()), SLOT(saveScenarioJSON()));
 
   // Объединяем панели в ToolBox
-  QToolBox *tb = new QToolBox(this);
-  tb->addItem(&locators_ctrl, "Локаторы");
-  tb->addItem(&trajs_ctrl,    "Траектории");
-  tb->addItem(&targets_ctrl,  "Цели");
-  tb->addItem(&params,        "Общие параметры");
-  tb->setGeometry(670, 20, 350, 500);
+  main_toolbox = new QToolBox(this);
+  main_toolbox->addItem(&locators_ctrl, "Локаторы");
+  main_toolbox->addItem(&trajs_ctrl,    "Траектории");
+  main_toolbox->addItem(&targets_ctrl,  "Цели");
+  main_toolbox->addItem(&params,        "Общие параметры");
+  main_toolbox->setGeometry(670, 20, 350, 500);
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
   updateLocators();
+
+  setAllEnabled(true);
+  ui->pbPauseImit->setEnabled(false);
+  ui->pbStopImit->setEnabled(false);
 }
 
 Widget::~Widget()
@@ -128,6 +131,10 @@ void Widget::startImit()
     return;
   }
 
+  setAllEnabled(false);
+  ui->pbPauseImit->setEnabled(true);
+  ui->pbStopImit->setEnabled(true);
+
   timer.start(DELTA_T * 1000);
   for (Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
     it->start();
@@ -155,9 +162,29 @@ void Widget::pauseImit()
 
 void Widget::stopImit()
 {
+  setAllEnabled(true);
+
+  for (Targets::iterator it = targets_ctrl.getTargets().begin();
+                         it != targets_ctrl.getTargets().end(); ++it) {
+    it->reset();
+  }
   for (Locators::iterator it = locators_ctrl.getLocators().begin();
                           it != locators_ctrl.getLocators().end(); ++it) {
+    it->reset();
     it->closeFile();
   }
   timer.stop();
+}
+
+void Widget::setAllEnabled(bool e)
+{
+  mv->setEnabled(e);
+  main_toolbox->setEnabled(e);
+  ui->pbStartImit->setEnabled(e);
+  ui->pbStopImit->setEnabled(e);
+  ui->pbPauseImit->setEnabled(e);
+  ui->pbReset->setEnabled(e);
+  ui->pbUpdate->setEnabled(e);
+  ui->pbSaveScenario->setEnabled(e);
+  ui->pbLoadScenario->setEnabled(e);
 }
