@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     trajs_ctrl.cpp \
     #trajs_model.cpp \
     treeitem.cpp \
-    treemodel.cpp
+    treemodel.cpp \
+    targ_updater.cpp
 
 HEADERS  += widget.h \
     parser.h \
@@ -49,7 +50,8 @@ HEADERS  += widget.h \
     trajs_ctrl.h \
     #trajs_model.h \
     treeitem.h \
-    treemodel.h
+    treemodel.h \
+    targ_updater.h
 
 FORMS    += widget.ui
 

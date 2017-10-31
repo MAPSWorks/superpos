@@ -1,11 +1,7 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include <QPointF>
-#include <QTime>
-
-#include <chrono>
-
+#include "targ_updater.h"
 #include "trajectory.h"
 
 using namespace std;
