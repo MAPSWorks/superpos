@@ -220,3 +220,18 @@ bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
 
     return result;
 }
+
+QModelIndex TreeModel::addPairKeyValue(const QVariant &key, const QVariant &value, const QModelIndex &parent)
+{
+  QModelIndex index_key, index_value;
+
+  unsigned i = rowCount(parent);
+
+  insertRow(i, parent);
+  index_key = index(i, 0, parent);
+  setData(index_key, key, Qt::EditRole);
+  index_value = index(i, 1, parent);
+  setData(index_value, value, Qt::EditRole);
+
+  return index_key;
+}

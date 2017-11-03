@@ -52,6 +52,8 @@ QString LocatorDialog::filename() const
 TargetDialog::TargetDialog(unsigned N, QWidget* pwgt/*= 0*/)
      : QDialog(pwgt, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
 {
+    setWindowTitle("Добавление цели");
+
     traj = new QSpinBox;
     vel = new QLineEdit;
     acc  = new QLineEdit;
@@ -75,11 +77,11 @@ TargetDialog::TargetDialog(unsigned N, QWidget* pwgt/*= 0*/)
     //Layout setup
     QGridLayout* ptopLayout = new QGridLayout;
     ptopLayout->addWidget(l_traj, 0, 0);
-    ptopLayout->addWidget(l_vel, 1, 0);
-    ptopLayout->addWidget(l_acc, 2, 0);
+    //ptopLayout->addWidget(l_vel, 1, 0);
+    //ptopLayout->addWidget(l_acc, 2, 0);
     ptopLayout->addWidget(traj, 0, 1);
-    ptopLayout->addWidget(vel, 1, 1);
-    ptopLayout->addWidget(acc, 2, 1);
+    //ptopLayout->addWidget(vel, 1, 1);
+    //ptopLayout->addWidget(acc, 2, 1);
     ptopLayout->addWidget(pcmdOk, 3,0);
     ptopLayout->addWidget(pcmdCancel, 3, 1);
     setLayout(ptopLayout);

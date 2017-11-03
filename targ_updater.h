@@ -16,8 +16,7 @@ public:
 
   bool actual(double t) {
     return ((t > begin_time) &&
-            (t < (begin_time + duration )) ||
-              (!next));
+            (t < (begin_time + duration )));
   }
   void add(BaseTargUpdater* n) {
     if (next) next->add(n);

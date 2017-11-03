@@ -115,6 +115,10 @@ public:
     bool removeRows(int position, int rows,
                     const QModelIndex &parent = QModelIndex()) override;
 
+    /// Добавление пары ключ-значение
+    QModelIndex addPairKeyValue(const QVariant &key, const QVariant &value,
+                                const QModelIndex &parent = QModelIndex());
+
 private:
     void setupModelData(const QStringList &lines, TreeItem *parent);
     TreeItem *getItem(const QModelIndex &index) const;

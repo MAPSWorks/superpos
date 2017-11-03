@@ -8,6 +8,10 @@ using namespace std;
 
 typedef chrono::time_point<chrono::system_clock> Time;
 
+
+/// Класс, описывающий цель и её поведение
+/// Trajectory - траектория (маршрут движения), хранит набор точек
+/// Updater - цепочка из отрезков, должен быть установлен перед началом имитации
 class Target
 {
   public:
@@ -34,13 +38,17 @@ class Target
     bool getIsActive() { return isActive; }
 
     int getTrajID() { return traj->getID(); }
+    int getPointsNum() { return traj->getPoints().size(); }
+
+    void setUpdater(BaseTargUpdater *u) { upd = u; }
 
     void reset();
 
   private:
     double getTimeDelta();
 
-    BaseTrajectory *traj;
+    BaseTrajectory  *traj;
+    BaseTargUpdater *upd;
 
     double vel, acc;
     double delay;

@@ -25,6 +25,8 @@ class TargetsCtrl : public QWidget
     void loadJSON(const QJsonObject &json);
     void saveJSON(QJsonObject &json);
 
+    void createUpdaters();
+
   signals:
     void eventUpdate();
 

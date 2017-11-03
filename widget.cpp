@@ -125,6 +125,7 @@ void Widget::saveScenarioJSON()
 
 void Widget::startImit()
 {
+  targets_ctrl.createUpdaters();
   Targets& targets = targets_ctrl.getTargets();
   if (targets.empty()) {
     QMessageBox::information(0, "Запуск имитации", "Нет целей для имитации.");

@@ -46,7 +46,7 @@ void TargetsCtrl::loadJSON(const QJsonObject &json)
   for (int i = 0; i < targArray.size(); ++i) {
     QJsonObject targObject = targArray[i].toObject();
 
-    Trajectories trajs = trajs_ctrl->getTrajs();
+    Trajectories &trajs = trajs_ctrl->getTrajs();
     Target t(trajs.at(targObject["Traj ID"].toInt()));
     double start_time = targObject["Start"].toDouble();
     t.setIsActive(true);
@@ -83,7 +83,7 @@ void TargetsCtrl::saveJSON(QJsonObject &json)
 
 void TargetsCtrl::addTarget()
 {
-  Trajectories trajs = trajs_ctrl->getTrajs();
+  Trajectories &trajs = trajs_ctrl->getTrajs();
 
   if ((trajs_ctrl == NULL) || (trajs.empty())) {
     QMessageBox::information(0, "Добавление цели", "Нет ни одной заданной траектории.");
@@ -97,20 +97,23 @@ void TargetsCtrl::addTarget()
 
     bool ok1, ok2;
     unsigned traj_idx = pDialog->traj_num() - 1;
-    double vel = pDialog->velocity().toDouble(&ok1);
-    double acc = pDialog->accel().toDouble(&ok2);
+
+/*
+    //double vel = pDialog->velocity().toDouble(&ok1);
+    //double acc = pDialog->accel().toDouble(&ok2);
 
     if (!ok1 || !ok2) {
       QMessageBox::information(0, "Добавление цели", "Неверно введены данные.");
       return;
     }
+*/
 
     Trajectories trajs = trajs_ctrl->getTrajs();
     if (trajs.size() <= traj_idx) return;
 
     Target targ(trajs[traj_idx]);
-    targ.setVel(vel);
-    targ.setAcc(acc);
+    //targ.setVel(vel);
+    //targ.setAcc(acc);
 
     addTarg(targ);
 
@@ -129,39 +132,30 @@ void TargetsCtrl::addTarg(Target targ)
   targets.push_back(targ);
 
   QModelIndex root = tree_view.rootIndex();
-  QModelIndex index_targ, index_prm;;
 
   unsigned targ_num = targs_model->rowCount(root);
   if (!targs_model->insertRow(targ_num, root))
     return;
 
-  index_targ = targs_model->index(targ_num, 0, root);
+  QModelIndex index_targ = targs_model->index(targ_num, 0, root);
   targs_model->setData(index_targ, "Target " + QString::number(targ_num + 1), Qt::EditRole);
 
   QPointF c = targ.getCoords();
   cout << "addTarget: x,y: " << c.x() << " " << c.y() << endl;
 
-  targs_model->insertRow(0, index_targ);
-  index_prm = targs_model->index(0, 0, index_targ);
-  targs_model->setData(index_prm, "Traj idx", Qt::EditRole);
-  index_prm = targs_model->index(0, 1, index_targ);
-  targs_model->setData(index_prm, targ.getTrajID(), Qt::EditRole);
+  targs_model->addPairKeyValue("Traj idx", targ.getTrajID() + 1, index_targ);
 
-  targs_model->insertRow(1, index_targ);
-  index_prm = targs_model->index(1, 0, index_targ);
-  targs_model->setData(index_prm, "Vel", Qt::EditRole);
-  index_prm = targs_model->index(1, 1, index_targ);
-  targs_model->setData(index_prm, targ.getVel(), Qt::EditRole);
-
-  targs_model->insertRow(2, index_targ);
-  index_prm = targs_model->index(2, 0, index_targ);
-  targs_model->setData(index_prm, "Acc", Qt::EditRole);
-  index_prm = targs_model->index(2, 1, index_targ);
-  targs_model->setData(index_prm, targ.getAcc(), Qt::EditRole);
+  int lines_num = targ.getPointsNum() - 1;
+  for (int i = 0; i < lines_num; ++i) {
+    QModelIndex index_line = targs_model->addPairKeyValue("Line " + QString::number(i+1) + "-" + QString::number(i+2), "", index_targ);
+    targs_model->addPairKeyValue("Delay in " + QString::number(i+1),  0,  index_line);
+    targs_model->addPairKeyValue("Vel",                               1,  index_line);
+    targs_model->addPairKeyValue("Acc",                               0,  index_line);
+    targs_model->addPairKeyValue("Delay in " + QString::number(i+2),  0,  index_line);
+  }
 
   map_viewer->updateTargets(&targets);
 }
-
 
 void TargetsCtrl::deleteTarget()
 {
@@ -209,6 +203,78 @@ void TargetsCtrl::deleteAllTargets()
   map_viewer->updateTargets(&targets);
 }
 
+void TargetsCtrl::createUpdaters()
+{
+  QModelIndex root = tree_view.rootIndex();
+  Trajectories &trajs = trajs_ctrl->getTrajs();
+  unsigned targ_num = targs_model->rowCount(root);
+
+  for (int i_targ = 0; i_targ < targ_num; ++i_targ) {
+    Target &targ = targets[i_targ];
+
+    cout << __PRETTY_FUNCTION__ << "Traj ID = " << targ.getTrajID()
+                                << ", traj.size() = " << trajs.size() << endl;
+
+    if (targ.getTrajID() >= trajs.size()) continue;
+
+    LinearTargUpdater *upd = new LinearTargUpdater(0,0, QPointF(),QPointF(), 0,0);
+    QModelIndex index_targ = targs_model->index(i_targ, 0, root);
+
+    BaseTrajectory *traj = trajs[targ.getTrajID()];
+    PointsVector pv = traj->getPoints();
+
+    QPointF first, last;
+    double beg(0), dur(0),
+           delay_f(0), delay_l(0),
+           vel(0), acc(0);
+
+    /// -1, потому что первая строка - Traj ID
+    unsigned lines_num = targs_model->rowCount(index_targ) - 1;
+
+    if (lines_num != pv.size() - 1) {
+      cout << "Несоответствие между маршрутом и отрезками: "
+           << lines_num << " отрезков, " << pv.size() << " точек." << endl;
+      continue;
+    }
+
+    cout << __PRETTY_FUNCTION__ << "lines_num = " << lines_num << endl;
+
+    for (int i = 0; i < lines_num; ++i) {
+      first = pv[i];
+      last  = pv[i+1];
+
+      QModelIndex index_line = targs_model->index(i+1, 0, index_targ);
+      delay_f = targs_model->index(0, 1, index_line).data().toDouble();
+      vel     = targs_model->index(1, 1, index_line).data().toDouble() * 0.001;
+      acc     = targs_model->index(2, 1, index_line).data().toDouble() * 0.001;
+      delay_l = targs_model->index(3, 1, index_line).data().toDouble();
+
+      cout << __PRETTY_FUNCTION__ << " Model Data: " << targs_model->rowCount(index_line) << " rows: " << delay_f << " "
+                                  << vel << " " << acc << " " << delay_l << endl;
+
+      if (!TrajTools::findDurationWithCheck(dur, vel,acc, first,last)) {
+        cout << "Конечная точка отрезка недостижима при заданных параметрах" << endl;
+        break;
+      }
+      // Пауза в начале отрезка
+      if (delay_f > 10e-6) {
+        upd->add(new LinearTargUpdater(beg,delay_f, first,QPointF(), 0,0));
+        beg += delay_f;
+      }
+      // Движение на отрезке
+      upd->add(new LinearTargUpdater(beg,dur, first,last-first, vel,acc));
+      beg += dur;
+      // Пауза в конце отрезка
+      if (delay_l > 10e-6) {
+        upd->add(new LinearTargUpdater(beg,delay_l, last,QPointF(), 0,0));
+        beg += delay_l;
+      }
+      cout << __PRETTY_FUNCTION__ << "beg, dur: " << beg << ", " << dur << endl;
+    }
+    targ.setUpdater(upd);
+  }
+}
+
 void TargetsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
 {
   QModelIndex index_targ = tl.parent();
@@ -220,10 +286,10 @@ void TargetsCtrl::onDataChanged(QModelIndex tl, QModelIndex, QVector<int>)
 
   Target &t = targets[i_targ];
 
-  if (tl.row() == 1) t.setVel(tl.data().toDouble());
-  if (tl.row() == 2) t.setAcc(tl.data().toDouble());
+  // if (tl.row() == 1) t.setVel(tl.data().toDouble());
+  // if (tl.row() == 2) t.setAcc(tl.data().toDouble());
 
- // trajs[i_t]->setPoints(pv);
+  // trajs[i_t]->setPoints(pv);
 
   map_viewer->updateTargets(&targets);
 }
@@ -252,5 +318,5 @@ void TargetsCtrl::setMapViewer(Mapviewer * mv)
   map_viewer = mv;
 
   connect(map_viewer, SIGNAL(targetClicked(int)), this, SLOT(onTargetClicked(int)));
-  //connect(this, SIGNAL(targetSelected(int)), map_viewer, SLOT(selectTarget(int)));
+  // connect(this, SIGNAL(targetSelected(int)), map_viewer, SLOT(selectTarget(int)));
 }

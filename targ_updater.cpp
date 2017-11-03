@@ -15,7 +15,8 @@ QPointF LinearTargUpdater::getCoords(double t)
 {
   QPointF c;
   if (actual(t)) {
-    c = coords0 + dir * (vel * (t-begin_time) + acc * (t-begin_time) / 2);
+    // TODO: Сделать нормальные скорости!!!
+    c = coords0 + dir / TrajTools::abs(dir) * (vel * (t-begin_time) + acc * (t-begin_time) / 2);
   }
   else {
     c = BaseTargUpdater::getCoords(t);

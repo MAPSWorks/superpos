@@ -29,7 +29,7 @@ QPointF LinearTrajectory::getCoords(double t, double vel, double acc)
     t_prev = t_next;
     vel += acc * t_prev;
 
-    bool can_get_next_point = findRootSqr(delta_t, acc/2, vel, -abs_d);
+    bool can_get_next_point = TrajTools::findRootSqrWithCheck(delta_t, acc/2, vel, -abs_d);
 
     if (!can_get_next_point)
       return points[i] + vel * (d / abs_d) * (t - t_prev) / 2;
