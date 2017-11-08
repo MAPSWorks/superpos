@@ -50,7 +50,7 @@ void TrajsCtrl::setMapViewer(Mapviewer * mv)
 {
   map_viewer = mv;
 
-  connect(map_viewer, SIGNAL(trajClicked(int)), this, SLOT(onTrajClicked(int)));
+  connect(map_viewer, SIGNAL(trajClicked(int)), SLOT(onTrajClicked(int)));
   //connect(this, SIGNAL(trajSelected(int)), map_viewer, SLOT(selectTraj(int)));
 }
 
@@ -123,8 +123,10 @@ void TrajsCtrl::beginAddTraj()
   connect(map_viewer, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
           this, SLOT(addTrajPoint(const QMouseEvent*,QPointF)));
 
+  disconnect(map_viewer, SIGNAL(trajClicked(int)), this, SLOT(onTrajClicked(int)));
   disconnect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
           this, SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
+
 
   QPen* linepen = new QPen(QColor(0, 255, 0, 100));
   linepen->setWidth(3);
@@ -156,6 +158,7 @@ void TrajsCtrl::endAddTraj()
   pbBeginAddTraj.setEnabled(true);
   pbEndAddTraj.setEnabled(false);
 
+  connect(map_viewer, SIGNAL(trajClicked(int)), SLOT(onTrajClicked(int)));
   connect(trajs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
           this,        SLOT(onDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 }
@@ -287,6 +290,8 @@ void TrajsCtrl::onTrajClicked(int idx)
   QModelIndex index, root;
   root = tree_view.rootIndex();
   index = trajs_model->index(idx, 0, root);
+
+  map_viewer->selectTraj(idx);
 
   tree_view.selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
 }

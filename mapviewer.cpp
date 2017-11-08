@@ -267,7 +267,6 @@ void Mapviewer::onTrajClicked(Geometry* g, QPoint)
 {
   int idx = g->name().toInt() - 1;
   cout << "onTrajClicked, " << g->objectName().toStdString() << endl;
-  selectTraj(idx);
   emit trajClicked(idx);
 }
 
