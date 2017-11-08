@@ -152,14 +152,25 @@ void Widget::startImit()
 
 void Widget::pauseImit()
 {
-  /*
   if (timer.isActive()) {
     timer.stop();
+    timeBeforePause = std::chrono::system_clock::now();
+    ui->pbPauseImit->setText("Продолжить");
   }
   else {
+    double delta_ns = chrono::duration_cast<std::chrono::nanoseconds>
+                       (chrono::system_clock::now()-timeBeforePause).count();
+    for (Targets::iterator it = targets_ctrl.getTargets().begin();
+                           it != targets_ctrl.getTargets().end(); ++it) {
+      it->shiftTimeForDelta((double)delta_ns*1e-9);
+    }
+    for (Locators::iterator it = locators_ctrl.getLocators().begin();
+                            it != locators_ctrl.getLocators().end(); ++it) {
+      it->shiftTimeForDelta(delta_ns);
+    }
+    ui->pbPauseImit->setText("Пауза");
     timer.start();
   }
-  */
 }
 
 void Widget::stopImit()

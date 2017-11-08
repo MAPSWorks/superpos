@@ -21,6 +21,11 @@ void BaseTargUpdater::rebuildOnTime(double t) {
   if (next) next->rebuildOnTime(t + duration);
 }
 
+void BaseTargUpdater::shiftTimeForDelta(double t) {
+  begin_time += t;
+  if (next) next->shiftTimeForDelta(t);
+}
+
 void BaseTargUpdater::add(BaseTargUpdater* n) {
   if (next) next->add(n);
   else      next = n;

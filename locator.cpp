@@ -171,6 +171,13 @@ double Locator::getPhi()
   return (int)(getAngle0() + 360.0 * getSpeed() * t) % 360;
 }
 
+void Locator::shiftTimeForDelta(double d)
+{
+  long dur_ns = static_cast<long>(d);
+  startTime += chrono::nanoseconds(dur_ns);
+  // cout << "Loc shift for " << d << ", " << dur_ns << " ms" << endl;
+}
+
 void Locator::reset()
 {
 

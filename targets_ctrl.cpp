@@ -141,7 +141,6 @@ void TargetsCtrl::addTarg(Target targ)
   targs_model->setData(index_targ, "Target " + QString::number(targ_num + 1), Qt::EditRole);
 
   QPointF c = targ.getCoords();
-  cout << "addTarget: x,y: " << c.x() << " " << c.y() << endl;
 
   targs_model->addPairKeyValue("Traj idx", targ.getTrajID() + 1, index_targ);
 
@@ -212,9 +211,6 @@ void TargetsCtrl::createUpdaters()
   for (int i_targ = 0; i_targ < targ_num; ++i_targ) {
     Target &targ = targets[i_targ];
 
-    cout << __PRETTY_FUNCTION__ << "Traj ID = " << targ.getTrajID()
-                                << ", traj.size() = " << trajs.size() << endl;
-
     if (targ.getTrajID() >= trajs.size()) continue;
 
     LinearTargUpdater *upd = new LinearTargUpdater(0,0, QPointF(),QPointF(), 0,0);
@@ -237,8 +233,6 @@ void TargetsCtrl::createUpdaters()
       continue;
     }
 
-    cout << __PRETTY_FUNCTION__ << "lines_num = " << lines_num << endl;
-
     for (int i = 0; i < lines_num; ++i) {
       first = pv[i];
       last  = pv[i+1];
@@ -249,8 +243,10 @@ void TargetsCtrl::createUpdaters()
       acc     = targs_model->index(2, 1, index_line).data().toDouble() * 0.001;
       delay_l = targs_model->index(3, 1, index_line).data().toDouble();
 
+/*
       cout << __PRETTY_FUNCTION__ << " Model Data: " << targs_model->rowCount(index_line) << " rows: " << delay_f << " "
                                   << vel << " " << acc << " " << delay_l << endl;
+*/
 
       if (!TrajTools::findDurationWithCheck(dur, vel,acc, first,last)) {
         cout << "Конечная точка отрезка недостижима при заданных параметрах" << endl;
@@ -269,7 +265,7 @@ void TargetsCtrl::createUpdaters()
         upd->add(new LinearTargUpdater(beg,delay_l, last,QPointF(), 0,0));
         beg += delay_l;
       }
-      cout << __PRETTY_FUNCTION__ << "beg, dur: " << beg << ", " << dur << endl;
+      // cout << __PRETTY_FUNCTION__ << "beg, dur: " << beg << ", " << dur << endl;
     }
     targ.setUpdater(upd);
   }

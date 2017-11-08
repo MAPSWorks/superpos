@@ -17,6 +17,7 @@ public:
   bool actual(double t);
   bool isChainActual(double t);
   void rebuildOnTime(double t);
+  void shiftTimeForDelta(double t);
 
   void add(BaseTargUpdater* n);
 

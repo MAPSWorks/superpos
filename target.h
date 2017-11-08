@@ -45,6 +45,7 @@ class Target
 
     void setUpdater(BaseTargUpdater *u) { upd = u; }
 
+    void shiftTimeForDelta(double d) { upd->shiftTimeForDelta(d); }
     void reset();
 
   private:

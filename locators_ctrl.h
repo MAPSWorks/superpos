@@ -26,6 +26,7 @@ class LocatorsCtrl: public QWidget
     QPointF getCenter();
     void updateCommonParams(const CommonParams& p);
 
+
   signals:
     void eventUpdate();
 

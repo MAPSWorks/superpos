@@ -54,6 +54,8 @@ class Widget : public QWidget
 
     QTimer timer;
 
+    chrono::time_point<chrono::system_clock> timeBeforePause;
+
     QToolBox * main_toolbox;
     ParamsGroupBox params;
     LocatorsCtrl   locators_ctrl;

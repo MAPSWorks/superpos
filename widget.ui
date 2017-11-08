@@ -48,9 +48,9 @@
   <widget class="QPushButton" name="pbStartImit">
    <property name="geometry">
     <rect>
-     <x>710</x>
+     <x>690</x>
      <y>640</y>
-     <width>71</width>
+     <width>91</width>
      <height>30</height>
     </rect>
    </property>
@@ -63,7 +63,7 @@
     <rect>
      <x>890</x>
      <y>640</y>
-     <width>71</width>
+     <width>91</width>
      <height>30</height>
     </rect>
    </property>
@@ -74,9 +74,9 @@
   <widget class="QPushButton" name="pbPauseImit">
    <property name="geometry">
     <rect>
-     <x>800</x>
+     <x>790</x>
      <y>640</y>
-     <width>71</width>
+     <width>91</width>
      <height>30</height>
     </rect>
    </property>
