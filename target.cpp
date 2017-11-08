@@ -6,22 +6,14 @@
 using namespace std;
 
 Target::Target(BaseTrajectory *tr):
-  traj(tr), vel(0), acc(0),
-  delay(0), isActive(false),
+  traj(tr), delay(0), isActive(false),
   isLooped(false), upd(NULL)
 {
-
 }
 
 void Target::start()
 {
   startTime = chrono::system_clock::now();
-}
-
-void Target::startLater(double d)
-{
-  delay = d;
-  start();
 }
 
 bool Target::isExistingNow()
@@ -48,7 +40,7 @@ double Target::getTimeDelta()
 
 QPointF Target::getCoords()
 {
-  QPointF c, c1;
+  QPointF c;
 
   if (upd) {
     double t = getTimeDelta();
@@ -58,7 +50,7 @@ QPointF Target::getCoords()
     c = upd -> getCoords(t);
   }
   else {
-    c = traj -> getCoords(getTimeDelta(), vel, acc);
+    c = QPointF();
   }
   return c;
 }

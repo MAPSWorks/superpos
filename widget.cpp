@@ -200,4 +200,5 @@ void Widget::setAllEnabled(bool e)
   ui->pbUpdate->setEnabled(e);
   ui->pbSaveScenario->setEnabled(e);
   ui->pbLoadScenario->setEnabled(e);
+  ui->cbLoop->setEnabled(e);
 }

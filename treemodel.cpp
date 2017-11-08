@@ -86,9 +86,13 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return 0;
 
-    if (index.column() == 0) return QAbstractItemModel::flags(index);
+    /// Разрешаем редактировать только третий уровень
+    /// вторую колонку (поле "значение")
+    /// (необходимо в используемых в данном проекте моделях)
+    if ((index.column() == 1) && index.parent().parent().isValid())
+      return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
 
-    return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+    return QAbstractItemModel::flags(index);
 }
 
 TreeItem *TreeModel::getItem(const QModelIndex &index) const

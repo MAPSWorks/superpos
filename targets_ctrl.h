@@ -48,6 +48,7 @@ class TargetsCtrl : public QWidget
 
   private:
     void addTarg(Target);
+    void addTarg(Target, QJsonObject);
     void deleteAllTargets();
 
     TreeModel *targs_model;

@@ -45,17 +45,16 @@ void TargetsCtrl::loadJSON(const QJsonObject &json)
 
   for (int i = 0; i < targArray.size(); ++i) {
     QJsonObject targObject = targArray[i].toObject();
-
     Trajectories &trajs = trajs_ctrl->getTrajs();
-    Target t(trajs.at(targObject["Traj ID"].toInt()));
-    double start_time = targObject["Start"].toDouble();
-    t.setIsActive(true);
-    //t.setStartTime(start_time);
-    t.setVel(targObject["Vel"].toDouble());
-    t.setAcc(targObject["Acc"].toDouble());
+    Target t(trajs.at(targObject["Traj_ID"].toInt()));
 
-    addTarg(t);
+    // double start_time = targObject["Start"].toDouble();
+    // t.setDelay(start_time);
+    t.setIsActive(true);
+
+    addTarg(t, targObject);
   }
+
   map_viewer->updateTargets(&targets);
 
   connect(targs_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
@@ -66,18 +65,40 @@ void TargetsCtrl::loadJSON(const QJsonObject &json)
 
 void TargetsCtrl::saveJSON(QJsonObject &json)
 {
+  QModelIndex root = tree_view.rootIndex();
+  unsigned targ_num = targs_model->rowCount(root);
   QJsonArray targArray;
 
-  for (Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+  for (int i_targ = 0; i_targ < targ_num; ++i_targ) {
+    Target &targ = targets[i_targ];
     QJsonObject targObject;
 
-    targObject.insert("Traj ID", it->getTrajID());
-    targObject.insert("Vel",  it->getVel());
-    targObject.insert("Acc",  it->getAcc());
+    targObject.insert("Traj_ID", targ.getTrajID());
 
+    double d1(0), d2(0), vel(0), acc(0);
+    QModelIndex index_targ = targs_model->index(i_targ, 0, root);
+
+    /// -1, потому что первая строка - Traj ID
+    unsigned lines_num = targs_model->rowCount(index_targ) - 1;
+    QJsonArray lineArray;
+
+    for (int i = 0; i < lines_num; ++i) {
+      QJsonObject lineObject;
+      QModelIndex index_line = targs_model->index(i+1, 0, index_targ);
+      d1  = targs_model->index(0, 1, index_line).data().toDouble();
+      vel = targs_model->index(1, 1, index_line).data().toDouble();
+      acc = targs_model->index(2, 1, index_line).data().toDouble();
+      d2  = targs_model->index(3, 1, index_line).data().toDouble();
+
+      lineObject.insert("Delay_1", d1);
+      lineObject.insert("Vel",    vel);
+      lineObject.insert("Acc",    acc);
+      lineObject.insert("Delay_2", d2);
+      lineArray.append(lineObject);
+    }
+    targObject.insert("Lines", lineArray);
     targArray.append(targObject);
   }
-
   json["Targets"] = targArray;
 }
 
@@ -129,28 +150,40 @@ void TargetsCtrl::addTarget()
 
 void TargetsCtrl::addTarg(Target targ)
 {
+  addTarg(targ, QJsonObject());
+}
+
+void TargetsCtrl::addTarg(Target targ, QJsonObject json)
+{
   targets.push_back(targ);
 
   QModelIndex root = tree_view.rootIndex();
-
   unsigned targ_num = targs_model->rowCount(root);
   if (!targs_model->insertRow(targ_num, root))
     return;
 
   QModelIndex index_targ = targs_model->index(targ_num, 0, root);
   targs_model->setData(index_targ, "Target " + QString::number(targ_num + 1), Qt::EditRole);
-
-  QPointF c = targ.getCoords();
-
   targs_model->addPairKeyValue("Traj idx", targ.getTrajID() + 1, index_targ);
+  QJsonArray lineArray = json["Lines"].toArray();
 
   int lines_num = targ.getPointsNum() - 1;
   for (int i = 0; i < lines_num; ++i) {
     QModelIndex index_line = targs_model->addPairKeyValue("Line " + QString::number(i+1) + "-" + QString::number(i+2), "", index_targ);
-    targs_model->addPairKeyValue("Delay in " + QString::number(i+1),  0,  index_line);
-    targs_model->addPairKeyValue("Vel",                               1,  index_line);
-    targs_model->addPairKeyValue("Acc",                               0,  index_line);
-    targs_model->addPairKeyValue("Delay in " + QString::number(i+2),  0,  index_line);
+
+    double d1(0), v(1), a(0), d2(0);
+    if (!json.empty()) {
+      QJsonObject lineObject = lineArray[i].toObject();
+      d1 = lineObject["Delay_1"].toInt();
+      v  = lineObject["Vel"].toInt();
+      a  = lineObject["Acc"].toInt();
+      d2 = lineObject["Delay_2"].toInt();
+    }
+
+    targs_model->addPairKeyValue("Delay in " + QString::number(i+1),  d1,  index_line);
+    targs_model->addPairKeyValue("Vel",                               v,  index_line);
+    targs_model->addPairKeyValue("Acc",                               a,  index_line);
+    targs_model->addPairKeyValue("Delay in " + QString::number(i+2),  d2,  index_line);
   }
 
   map_viewer->updateTargets(&targets);

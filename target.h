@@ -8,7 +8,6 @@ using namespace std;
 
 typedef chrono::time_point<chrono::system_clock> Time;
 
-
 /// Класс, описывающий цель и её поведение
 /// Trajectory - траектория (маршрут движения), хранит набор точек
 /// Updater - цепочка из отрезков, должен быть установлен перед началом имитации
@@ -25,11 +24,7 @@ class Target
 
     QPointF getCoords();
 
-    void setVel(double v) { vel = v; }
-    double getVel() { return vel; }
-
-    void setAcc(double a) { acc = a; }
-    double getAcc() { return acc; }
+    void setDelay(double t) { delay = t; }
 
     void setStartTime(Time t) { startTime = t; }
     Time getStartTime() { return startTime; }
@@ -54,7 +49,6 @@ class Target
     BaseTrajectory  *traj;
     BaseTargUpdater *upd;
 
-    double vel, acc;
     double delay;
 
     bool   isActive;
