@@ -320,3 +320,11 @@ void TargetsCtrl::setMapViewer(Mapviewer * mv)
   connect(map_viewer, SIGNAL(targetClicked(int)), this, SLOT(onTargetClicked(int)));
   // connect(this, SIGNAL(targetSelected(int)), map_viewer, SLOT(selectTarget(int)));
 }
+
+void TargetsCtrl::setLoopAll(int state)
+{
+  bool looped = (state > 0);
+  for (Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+    it -> setIsLooped(looped);
+  }
+}

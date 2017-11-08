@@ -37,6 +37,9 @@ class Target
     void setIsActive(bool a) { isActive = a; }
     bool getIsActive() { return isActive; }
 
+    void setIsLooped(bool l) { isLooped = l; }
+    bool getIsLooped() { return isLooped; }
+
     int getTrajID() { return traj->getID(); }
     int getPointsNum() { return traj->getPoints().size(); }
 
@@ -54,6 +57,7 @@ class Target
     double delay;
 
     bool   isActive;
+    bool   isLooped;
 
     Time startTime;
 };

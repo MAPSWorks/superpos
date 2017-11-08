@@ -110,6 +110,19 @@
     <string>Сохранить сц-й</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="cbLoop">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>680</y>
+     <width>181</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Зациклить движение</string>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

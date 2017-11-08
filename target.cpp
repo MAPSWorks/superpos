@@ -8,7 +8,7 @@ using namespace std;
 Target::Target(BaseTrajectory *tr):
   traj(tr), vel(0), acc(0),
   delay(0), isActive(false),
-  upd(NULL)
+  isLooped(false), upd(NULL)
 {
 
 }
@@ -51,14 +51,15 @@ QPointF Target::getCoords()
   QPointF c, c1;
 
   if (upd) {
-    c = upd -> getCoords(getTimeDelta());
-    cout << __PRETTY_FUNCTION__ << "Coords upd: " << c.x() << ", " << c.y() << endl;
+    double t = getTimeDelta();
+    if (!upd->isChainActual(t)) {
+      if (isLooped) upd->rebuildOnTime(t);
+    }
+    c = upd -> getCoords(t);
   }
   else {
     c = traj -> getCoords(getTimeDelta(), vel, acc);
   }
-  c1 = traj -> getCoords(getTimeDelta(), vel, acc);
-  cout << __PRETTY_FUNCTION__ << "Coords traj: " << c1.x() << ", " << c1.y() << endl;
   return c;
 }
 

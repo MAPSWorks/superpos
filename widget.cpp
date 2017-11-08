@@ -35,6 +35,7 @@ Widget::Widget():
   connect(ui->pbStartImit, SIGNAL(released()), SLOT(startImit()));
   connect(ui->pbPauseImit, SIGNAL(released()), SLOT(pauseImit()));
   connect(ui->pbStopImit,  SIGNAL(released()), SLOT(stopImit()));
+  connect(ui->cbLoop,      SIGNAL(stateChanged(int)), &targets_ctrl, SLOT(setLoopAll(int)));
 
   // Управление сценариями (временно)
   connect(ui->pbLoadScenario, SIGNAL(released()), SLOT(loadScenarioJSON()));

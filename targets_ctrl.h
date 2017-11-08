@@ -43,6 +43,9 @@ class TargetsCtrl : public QWidget
     /// Обработчик выбора цели в tree_view
     void onTargetSelected(QModelIndex);
 
+    /// Установка зацикливания движения всех целей
+    void setLoopAll(int);
+
   private:
     void addTarg(Target);
     void deleteAllTargets();

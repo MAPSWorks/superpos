@@ -14,18 +14,13 @@ public:
   BaseTargUpdater(double, double);
   virtual ~BaseTargUpdater() {}
 
-  bool actual(double t) {
-    return ((t > begin_time) &&
-            (t < (begin_time + duration )));
-  }
-  void add(BaseTargUpdater* n) {
-    if (next) next->add(n);
-    else      next = n;
-  }
-  virtual QPointF getCoords(double t) {
-    if (next) return next->getCoords(t);
-    else return QPointF();
-  }
+  bool actual(double t);
+  bool isChainActual(double t);
+  void rebuildOnTime(double t);
+
+  void add(BaseTargUpdater* n);
+
+  virtual QPointF getCoords(double t);
 
 protected:
   double begin_time,
