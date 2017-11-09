@@ -54,6 +54,7 @@ Mapviewer::Mapviewer(QWidget *parent):
   mc->addLayer(azimlayer);
 
   mc->showScale(true);
+  mc->enablePersistentCache();
 
   connect(mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*,QPointF)),
           this, SLOT(onMouseEventCoordinate(const QMouseEvent*,QPointF)));

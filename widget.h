@@ -1,7 +1,7 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QPainter>
 #include <QTimer>
 #include <QWheelEvent>
@@ -25,7 +25,7 @@ namespace Ui {
   class Widget;
 }
 
-class Widget : public QWidget
+class Widget : public QMainWindow
 {
   Q_OBJECT
 

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDockWidget>
 
 using namespace std;
 
@@ -41,6 +42,7 @@ Widget::Widget():
   connect(ui->pbLoadScenario, SIGNAL(released()), SLOT(loadScenarioJSON()));
   connect(ui->pbSaveScenario,  SIGNAL(released()), SLOT(saveScenarioJSON()));
 
+#if 1
   // Объединяем панели в ToolBox
   main_toolbox = new QToolBox(this);
   main_toolbox->addItem(&locators_ctrl, "Локаторы");
@@ -48,6 +50,29 @@ Widget::Widget():
   main_toolbox->addItem(&targets_ctrl,  "Цели");
   main_toolbox->addItem(&params,        "Общие параметры");
   main_toolbox->setGeometry(670, 20, 350, 500);
+
+#else
+  // Создаём doc-виджеты
+  QDockWidget *docwgt_loc = new QDockWidget("Локаторы", this);
+  docwgt_loc->setWidget(&locators_ctrl);
+  addDockWidget(Qt::RightDockWidgetArea, docwgt_loc);
+  docwgt_loc->setMaximumSize(300, 300);
+
+  QDockWidget *docwgt_traj = new QDockWidget("Траектории", this);
+  docwgt_traj->setWidget(&trajs_ctrl);
+  addDockWidget(Qt::RightDockWidgetArea, docwgt_traj);
+  docwgt_traj->setMaximumSize(300, 300);
+
+  QDockWidget *docwgt_targ = new QDockWidget("Цели", this);
+  docwgt_targ->setWidget(&targets_ctrl);
+  addDockWidget(Qt::RightDockWidgetArea, docwgt_targ);
+  docwgt_targ->setMaximumSize(300, 300);
+
+  QDockWidget *docwgt_param = new QDockWidget("Общие параметры", this);
+  docwgt_param->setWidget(&params);
+  addDockWidget(Qt::RightDockWidgetArea, docwgt_param);
+  docwgt_param->setMaximumSize(300, 300);
+#endif
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(updateTargets()));
 
@@ -192,7 +217,7 @@ void Widget::stopImit()
 void Widget::setAllEnabled(bool e)
 {
   mv->setEnabled(e);
-  main_toolbox->setEnabled(e);
+  //main_toolbox->setEnabled(e);
   ui->pbStartImit->setEnabled(e);
   ui->pbStopImit->setEnabled(e);
   ui->pbPauseImit->setEnabled(e);
